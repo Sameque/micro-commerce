@@ -1,0 +1,6 @@
+@MicroCommerce.Services.Payment.Api_HostAddress = http://localhost:5125
+
+GET {{MicroCommerce.Services.Payment.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

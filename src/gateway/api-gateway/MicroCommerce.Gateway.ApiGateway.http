@@ -1,0 +1,6 @@
+@MicroCommerce.Gateway.ApiGateway_HostAddress = http://localhost:5160
+
+GET {{MicroCommerce.Gateway.ApiGateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

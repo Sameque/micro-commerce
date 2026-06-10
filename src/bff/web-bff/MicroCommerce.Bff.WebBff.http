@@ -1,0 +1,6 @@
+@MicroCommerce.Bff.WebBff_HostAddress = http://localhost:5096
+
+GET {{MicroCommerce.Bff.WebBff_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

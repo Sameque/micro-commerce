@@ -1,0 +1,145 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/bff/" />
+  <Folder Name="/src/bff/web-bff/">
+    <Project Path="src/bff/web-bff/MicroCommerce.Bff.WebBff.csproj" />
+  </Folder>
+  <Folder Name="/src/building-blocks/" />
+  <Folder Name="/src/building-blocks/contracts/">
+    <Project Path="src/building-blocks/contracts/MicroCommerce.BuildingBlocks.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/src/building-blocks/event-bus/">
+    <Project Path="src/building-blocks/event-bus/MicroCommerce.BuildingBlocks.EventBus.csproj" />
+  </Folder>
+  <Folder Name="/src/building-blocks/observability/">
+    <Project Path="src/building-blocks/observability/MicroCommerce.BuildingBlocks.Observability.csproj" />
+  </Folder>
+  <Folder Name="/src/building-blocks/outbox/">
+    <Project Path="src/building-blocks/outbox/MicroCommerce.BuildingBlocks.Outbox.csproj" />
+  </Folder>
+  <Folder Name="/src/building-blocks/shared-kernel/">
+    <Project Path="src/building-blocks/shared-kernel/MicroCommerce.BuildingBlocks.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/gateway/" />
+  <Folder Name="/src/gateway/api-gateway/">
+    <Project Path="src/gateway/api-gateway/MicroCommerce.Gateway.ApiGateway.csproj" />
+  </Folder>
+  <Folder Name="/src/services/" />
+  <Folder Name="/src/services/audit-service/" />
+  <Folder Name="/src/services/audit-service/Api/">
+    <Project Path="src/services/audit-service/Api/MicroCommerce.Services.Audit.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/audit-service/Application/">
+    <Project Path="src/services/audit-service/Application/MicroCommerce.Services.Audit.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/audit-service/Domain/">
+    <Project Path="src/services/audit-service/Domain/MicroCommerce.Services.Audit.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/audit-service/Infrastructure/">
+    <Project Path="src/services/audit-service/Infrastructure/MicroCommerce.Services.Audit.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/auth-service/" />
+  <Folder Name="/src/services/auth-service/Api/">
+    <Project Path="src/services/auth-service/Api/MicroCommerce.Services.Auth.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/auth-service/Application/">
+    <Project Path="src/services/auth-service/Application/MicroCommerce.Services.Auth.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/auth-service/Domain/">
+    <Project Path="src/services/auth-service/Domain/MicroCommerce.Services.Auth.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/auth-service/Infrastructure/">
+    <Project Path="src/services/auth-service/Infrastructure/MicroCommerce.Services.Auth.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/cart-service/" />
+  <Folder Name="/src/services/cart-service/Api/">
+    <Project Path="src/services/cart-service/Api/MicroCommerce.Services.Cart.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/cart-service/Application/">
+    <Project Path="src/services/cart-service/Application/MicroCommerce.Services.Cart.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/cart-service/Domain/">
+    <Project Path="src/services/cart-service/Domain/MicroCommerce.Services.Cart.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/cart-service/Infrastructure/">
+    <Project Path="src/services/cart-service/Infrastructure/MicroCommerce.Services.Cart.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/catalog-service/" />
+  <Folder Name="/src/services/catalog-service/Api/">
+    <Project Path="src/services/catalog-service/Api/MicroCommerce.Services.Catalog.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/catalog-service/Application/">
+    <Project Path="src/services/catalog-service/Application/MicroCommerce.Services.Catalog.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/catalog-service/Domain/">
+    <Project Path="src/services/catalog-service/Domain/MicroCommerce.Services.Catalog.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/catalog-service/Infrastructure/">
+    <Project Path="src/services/catalog-service/Infrastructure/MicroCommerce.Services.Catalog.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/customer-service/" />
+  <Folder Name="/src/services/customer-service/Api/">
+    <Project Path="src/services/customer-service/Api/MicroCommerce.Services.Customer.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/customer-service/Application/">
+    <Project Path="src/services/customer-service/Application/MicroCommerce.Services.Customer.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/customer-service/Domain/">
+    <Project Path="src/services/customer-service/Domain/MicroCommerce.Services.Customer.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/customer-service/Infrastructure/">
+    <Project Path="src/services/customer-service/Infrastructure/MicroCommerce.Services.Customer.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/inventory-service/" />
+  <Folder Name="/src/services/inventory-service/Api/">
+    <Project Path="src/services/inventory-service/Api/MicroCommerce.Services.Inventory.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/inventory-service/Application/">
+    <Project Path="src/services/inventory-service/Application/MicroCommerce.Services.Inventory.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/inventory-service/Domain/">
+    <Project Path="src/services/inventory-service/Domain/MicroCommerce.Services.Inventory.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/inventory-service/Infrastructure/">
+    <Project Path="src/services/inventory-service/Infrastructure/MicroCommerce.Services.Inventory.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/notification-service/" />
+  <Folder Name="/src/services/notification-service/Api/">
+    <Project Path="src/services/notification-service/Api/MicroCommerce.Services.Notification.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/notification-service/Application/">
+    <Project Path="src/services/notification-service/Application/MicroCommerce.Services.Notification.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/notification-service/Domain/">
+    <Project Path="src/services/notification-service/Domain/MicroCommerce.Services.Notification.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/notification-service/Infrastructure/">
+    <Project Path="src/services/notification-service/Infrastructure/MicroCommerce.Services.Notification.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/order-service/" />
+  <Folder Name="/src/services/order-service/Api/">
+    <Project Path="src/services/order-service/Api/MicroCommerce.Services.Order.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/order-service/Application/">
+    <Project Path="src/services/order-service/Application/MicroCommerce.Services.Order.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/order-service/Domain/">
+    <Project Path="src/services/order-service/Domain/MicroCommerce.Services.Order.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/order-service/Infrastructure/">
+    <Project Path="src/services/order-service/Infrastructure/MicroCommerce.Services.Order.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/services/payment-service/" />
+  <Folder Name="/src/services/payment-service/Api/">
+    <Project Path="src/services/payment-service/Api/MicroCommerce.Services.Payment.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/services/payment-service/Application/">
+    <Project Path="src/services/payment-service/Application/MicroCommerce.Services.Payment.Application.csproj" />
+  </Folder>
+  <Folder Name="/src/services/payment-service/Domain/">
+    <Project Path="src/services/payment-service/Domain/MicroCommerce.Services.Payment.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/services/payment-service/Infrastructure/">
+    <Project Path="src/services/payment-service/Infrastructure/MicroCommerce.Services.Payment.Infrastructure.csproj" />
+  </Folder>
+</Solution>
