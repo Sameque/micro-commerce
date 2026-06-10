@@ -1,15 +1,35 @@
-# MicroCommerce - Plano de Implementação
+# SPRINT_PLAN.md
+
+# MicroCommerce Sprint Plan
 
 ## Objetivo
 
-Implementar o projeto MicroCommerce de forma incremental, seguindo práticas reais de desenvolvimento de software.
+Este documento descreve o planejamento de execução do projeto MicroCommerce.
 
-Cada sprint deve gerar uma entrega funcional, executável e validável.
+Estratégia adotada:
 
-Duração sugerida:
+* Entrega incremental
+* MVP funcional o mais cedo possível
+* Evolução gradual da arquitetura
+* Priorização dos componentes de negócio
+* Demonstração progressiva de competências técnicas
 
-* 1 semana por sprint
-* Total: 12 sprints
+---
+
+# Visão Geral
+
+| Sprint    | Objetivo                     |
+| --------- | ---------------------------- |
+| Sprint 01 | Foundation                   |
+| Sprint 02 | Auth Service                 |
+| Sprint 03 | Customer Service             |
+| Sprint 04 | Catalog Service              |
+| Sprint 05 | Cart Service                 |
+| Sprint 06 | Order + Inventory            |
+| Sprint 07 | RabbitMQ + Payment           |
+| Sprint 08 | Saga + Outbox                |
+| Sprint 09 | Gateway + BFF + Frontend     |
+| Sprint 10 | Observabilidade + Kubernetes |
 
 ---
 
@@ -17,58 +37,39 @@ Duração sugerida:
 
 ## Objetivo
 
-Criar toda a infraestrutura base do projeto.
+Criar toda a estrutura base do projeto.
 
 ## Entregas
 
-### Estrutura da Solution
+### Repositório
 
-```text
-microcommerce/
+* Estrutura de diretórios
+* Solution .NET
 
-src/
-services/
-gateway/
-building-blocks/
-docs/
-docker/
-k8s/
-```
+### Building Blocks
 
-### Shared Kernel
+* Shared Kernel
+* Contracts
+* Event Bus
+* Observability
+* Outbox
 
-Implementar:
+### Infraestrutura
 
-* Entity
-* AggregateRoot
-* ValueObject
-* DomainEvent
-* Result Pattern
-
-### Contracts
-
-Implementar:
-
-* BaseIntegrationEvent
-* EventMetadata
-* CorrelationId
-* EventVersion
-
-### Docker Compose
-
-Subir:
+Docker Compose contendo:
 
 * PostgreSQL
 * MongoDB
 * Redis
 * RabbitMQ
 
-### Critérios de Aceitação
+## Critério de Aceite
 
-* Solution compila.
-* Infraestrutura sobe com docker compose.
-* RabbitMQ acessível.
-* Bancos acessíveis.
+```text
+docker compose up -d
+
+todos os containers funcionando
+```
 
 ---
 
@@ -80,26 +81,39 @@ Implementar autenticação.
 
 ## Entregas
 
-### Endpoints
+### Auth Service
+
+Endpoints:
 
 ```http
 POST /register
+
 POST /login
+
 POST /refresh-token
 ```
 
 ### Funcionalidades
 
+* Cadastro
+* Login
 * JWT
 * Refresh Token
-* Hash de senha
-* Validação
 
-### Critérios
+### Banco
 
-* Login funcional.
-* Token válido.
-* Refresh Token funcional.
+PostgreSQL
+
+## Critério de Aceite
+
+```text
+Usuário consegue:
+
+Cadastrar
+Logar
+Receber JWT
+Renovar sessão
+```
 
 ---
 
@@ -107,21 +121,24 @@ POST /refresh-token
 
 ## Objetivo
 
-Implementar domínio de clientes.
+Gerenciar clientes.
 
 ## Entregas
 
-### Cliente
+### Endpoints
 
-* Criar
-* Atualizar
-* Consultar
+```http
+GET /customers/{id}
 
-### Endereço
+PUT /customers/{id}
 
-* Adicionar
-* Atualizar
-* Remover
+POST /customers/address
+```
+
+### Funcionalidades
+
+* Dados cadastrais
+* Endereços
 
 ### Evento
 
@@ -129,10 +146,11 @@ Implementar domínio de clientes.
 CustomerCreated
 ```
 
-### Critérios
+## Critério de Aceite
 
-* CRUD completo.
-* Evento publicado.
+```text
+Cliente consegue atualizar seus dados
+```
 
 ---
 
@@ -140,35 +158,39 @@ CustomerCreated
 
 ## Objetivo
 
-Implementar catálogo.
+Disponibilizar catálogo.
 
 ## Entregas
 
-### Categoria
+### Categorias
 
-CRUD completo.
+CRUD completo
 
-### Produto
+### Produtos
 
-CRUD completo.
+CRUD completo
 
-### Busca
+### Consulta
 
-* Nome
-* Categoria
+```http
+GET /products
+
+GET /products/{id}
+```
 
 ### Eventos
 
 ```text
 ProductCreated
+
 ProductUpdated
 ```
 
-### Critérios
+## Critério de Aceite
 
-* CRUD funcional.
-* Busca funcional.
-* Eventos publicados.
+```text
+Produtos podem ser cadastrados e consultados
+```
 
 ---
 
@@ -180,516 +202,375 @@ Implementar carrinho.
 
 ## Entregas
 
-### Funcionalidades
+### Redis
 
-* Adicionar item
-* Remover item
-* Atualizar quantidade
-* Limpar carrinho
+Persistência do carrinho
 
-### Persistência
+### Endpoints
 
-Redis
+```http
+POST /cart/items
 
-### Critérios
+PUT /cart/items
 
-* Carrinho persistido.
-* Operações funcionais.
+DELETE /cart/items
 
----
+GET /cart
+```
 
-# Sprint 06 - RabbitMQ Infrastructure
+## Critério de Aceite
 
-## Objetivo
+```text
+Usuário consegue:
 
-Criar infraestrutura de mensageria.
-
-## Entregas
-
-### Event Bus
-
-Implementar:
-
-* Publisher
-* Consumer
-
-### Recursos
-
-* Retry
-* DLQ
-* Logging
-
-### Critérios
-
-* Eventos trafegando.
-* Retry funcionando.
-* DLQ funcionando.
+Adicionar item
+Atualizar quantidade
+Remover item
+Visualizar carrinho
+```
 
 ---
 
-# Sprint 07 - Order Service
+# Sprint 06 - Order + Inventory
 
 ## Objetivo
 
-Implementar pedidos.
+Criar fluxo inicial de pedidos.
 
 ## Entregas
 
-### Pedido
+### Order Service
 
-* Criar pedido
-* Consultar pedido
+```http
+POST /orders
+
+GET /orders
+
+GET /orders/{id}
+```
+
+### Inventory Service
+
+```http
+POST /inventory/reserve
+
+POST /inventory/release
+```
 
 ### Estados
 
 ```text
 Pending
-Reserved
-Paid
+
 Confirmed
+
 Cancelled
 ```
 
-### Evento
+## Critério de Aceite
+
+```text
+Pedido criado com sucesso
+```
+
+---
+
+# Sprint 07 - RabbitMQ + Payment
+
+## Objetivo
+
+Implementar comunicação assíncrona.
+
+## Entregas
+
+### RabbitMQ
+
+* Exchanges
+* Queues
+* DLQ
+
+### Payment Service
+
+```http
+POST /payments
+```
+
+### Eventos
 
 ```text
 OrderCreated
-```
 
-### Critérios
-
-* Pedido criado.
-* Evento publicado.
-
----
-
-# Sprint 08 - Inventory Service
-
-## Objetivo
-
-Implementar estoque.
-
-## Entregas
-
-### Estoque
-
-* Entrada
-* Saída
-
-### Reserva
-
-* Reservar
-* Liberar
-
-### Eventos
-
-```text
 InventoryReserved
-InventoryReleased
-InventoryFailed
-```
 
-### Critérios
-
-* Reserva funcionando.
-* Eventos publicados.
-
----
-
-# Sprint 09 - Payment Service
-
-## Objetivo
-
-Implementar pagamentos.
-
-## Entregas
-
-### Gateway Simulado
-
-Criar mock de gateway.
-
-### Eventos
-
-```text
 PaymentApproved
+
 PaymentRejected
 ```
 
-### Critérios
+## Critério de Aceite
 
-* Aprovação simulada.
-* Rejeição simulada.
-* Eventos publicados.
+```text
+Eventos trafegando via RabbitMQ
+```
 
 ---
 
-# Sprint 10 - Saga Pattern
+# Sprint 08 - Saga + Outbox
 
 ## Objetivo
 
 Implementar consistência distribuída.
 
-## Fluxo
+## Entregas
+
+### Saga
+
+Fluxo principal:
 
 ```text
 OrderCreated
-      |
+    |
 InventoryReserved
-      |
+    |
 PaymentApproved
-      |
+    |
 OrderConfirmed
 ```
 
-### Fluxo de Compensação
+### Compensação
 
 ```text
 PaymentRejected
-      |
+    |
 InventoryReleased
-      |
+    |
 OrderCancelled
 ```
 
-### Critérios
+### Outbox
 
-* Fluxo completo funcionando.
-* Compensação funcionando.
+* Persistência
+* Dispatcher
+* Retry
 
----
-
-# Sprint 11 - Notification + Audit
-
-## Objetivo
-
-Implementar consumidores finais.
-
-## Notification Service
-
-Consumir:
+## Critério de Aceite
 
 ```text
-OrderConfirmed
-OrderCancelled
+Fluxos felizes e compensatórios funcionando
 ```
 
-### Funcionalidades
-
-* Simulação de envio de email
-
 ---
 
-## Audit Service
-
-Consumir:
-
-Todos os eventos.
-
-Persistir em MongoDB.
-
-### Critérios
-
-* Emails simulados.
-* Auditoria armazenada.
-
----
-
-# Sprint 12 - API Gateway
+# Sprint 09 - Gateway + BFF + Frontend
 
 ## Objetivo
 
-Centralizar acesso.
+Disponibilizar interface completa.
 
 ## Entregas
 
-### YARP
+### API Gateway
 
-Implementar:
+YARP
+
+Funcionalidades:
 
 * Roteamento
-* JWT Validation
+* JWT
+* Rate Limiting
 
-### Rate Limiting
+### BFF
 
-Implementar:
+Endpoints:
 
-* Limite por IP
+```http
+GET /catalog
 
-### Critérios
+GET /cart
 
-* Gateway roteando.
-* JWT validado.
-* Limite funcionando.
+POST /checkout
+
+GET /orders
+```
+
+### Frontend
+
+Telas:
+
+* Login
+* Cadastro
+* Home
+* Catálogo
+* Produto
+* Carrinho
+* Checkout
+* Pedidos
+
+## Critério de Aceite
+
+```text
+Fluxo completo:
+
+Login
+Catálogo
+Carrinho
+Checkout
+Pedido
+```
 
 ---
 
-# Sprint 13 - Outbox Pattern
+# Sprint 10 - Observabilidade + Kubernetes
 
 ## Objetivo
 
-Garantir consistência.
+Finalizar arquitetura cloud-native.
 
 ## Entregas
 
-### Outbox Table
+### OpenTelemetry
 
-Criar persistência.
+Instrumentação:
 
-### Dispatcher
+* HTTP
+* RabbitMQ
+* PostgreSQL
+* MongoDB
+* Redis
 
-Criar Worker.
+### Prometheus
 
-### Critérios
+Coleta de métricas
 
-* Eventos persistidos.
-* Publicação assíncrona funcionando.
+### Grafana
 
----
-
-# Sprint 14 - OpenTelemetry
-
-## Objetivo
-
-Observabilidade distribuída.
-
-## Entregas
-
-### Tracing
-
-Instrumentar:
+Dashboards:
 
 * APIs
 * RabbitMQ
-* PostgreSQL
-* MongoDB
-* Redis
+* Banco de Dados
+* Saga
 
-### Critérios
+### Kubernetes
 
-* Traces visíveis.
-
----
-
-# Sprint 15 - Prometheus
-
-## Objetivo
-
-Coletar métricas.
-
-## Entregas
-
-### Métricas
-
-* Requests
-* Errors
-* Latência
-* Filas
-
-### Critérios
-
-* Métricas disponíveis.
-
----
-
-# Sprint 16 - Grafana
-
-## Objetivo
-
-Visualização.
-
-## Dashboards
-
-### APIs
-
-* Requests
-* Erros
-* Latência
-
-### RabbitMQ
-
-* Filas
-* Consumo
-
-### Banco
-
-* Conexões
-* Tempo de consulta
-
-### Critérios
-
-* Dashboards prontos.
-
----
-
-# Sprint 17 - Testes Automatizados
-
-## Objetivo
-
-Garantir qualidade.
-
-## Unitários
-
-Cobertura mínima:
+Manifests:
 
 ```text
-80%
+Deployment
+
+Service
+
+Ingress
+
+ConfigMap
+
+Secret
 ```
 
-## Integração
+## Critério de Aceite
 
-Cobrir:
-
-* PostgreSQL
-* MongoDB
-* Redis
-* RabbitMQ
-
-### Critérios
-
-* Pipeline verde.
+```text
+Sistema totalmente monitorado
+```
 
 ---
 
-# Sprint 18 - Kubernetes
+# Definição de Pronto (Definition of Done)
 
-## Objetivo
+Uma tarefa é considerada concluída quando:
 
-Preparar deploy.
+### Código
 
-## Recursos
-
-### Deployments
-
-Todos os serviços.
-
-### Services
-
-Todos os serviços.
-
-### ConfigMaps
-
-Configurações.
-
-### Secrets
-
-Credenciais.
-
-### Ingress
-
-Entrada externa.
-
-### Critérios
-
-* Ambiente sobe no Kubernetes.
-
----
-
-# Sprint 19 - CI/CD
-
-## Objetivo
-
-Automação.
-
-## GitHub Actions
-
-### Build
-
-```bash
-dotnet build
-```
+* Compila
+* Sem warnings críticos
 
 ### Testes
 
-```bash
-dotnet test
-```
+* Unitários implementados
+* Todos passando
 
-### Docker
+### Observabilidade
 
-Build das imagens.
-
-### Critérios
-
-* Pipeline funcionando.
-
----
-
-# Sprint 20 - Finalização do Portfólio
-
-## Objetivo
-
-Preparar apresentação profissional.
-
-## Entregas
-
-### README
-
-Atualizado.
-
-### Diagramas
-
-* C4
-* Fluxos
-* Saga
-
-### Screenshots
-
-* Grafana
-* RabbitMQ
-* Swagger
+* Logs estruturados
+* Health Check disponível
 
 ### Documentação
 
-* Architecture
-* ADR
-* Event Catalog
-* Backlog
+* Swagger atualizado
+* Documentação revisada
 
-### Critérios
+### Qualidade
 
-Projeto pronto para:
-
-* GitHub
-* Entrevistas
-* Demonstrações técnicas
+* Code Review realizado
+* Padrões arquiteturais respeitados
 
 ---
 
-# Definition of Done
+# MVP
 
-Uma sprint será considerada concluída quando:
+Ao final da Sprint 09 o sistema deve permitir:
 
-* Código compilando.
-* Testes passando.
-* Docker funcional.
-* Documentação atualizada.
-* Code Review concluído.
-* Nenhum erro crítico aberto.
+```text
+Cadastro
+
+Login
+
+Consulta de Produtos
+
+Carrinho
+
+Checkout
+
+Pedido
+
+Pagamento
+
+Confirmação
+```
+
+---
+
+# Métricas de Sucesso
+
+## Backend
+
+* Cobertura mínima de testes: 80%
+* Health Checks em todos os serviços
+* Tracing distribuído funcionando
+
+## Frontend
+
+* Lighthouse > 90
+* Responsivo
+
+## Infraestrutura
+
+* Docker Compose funcional
+* Kubernetes funcional
 
 ---
 
 # Resultado Esperado
 
-Ao final da Sprint 20 o projeto deverá demonstrar:
+Ao final do projeto será possível demonstrar experiência prática com:
 
-* Arquitetura de Microservices
+* Microservices
 * DDD
 * Clean Architecture
 * CQRS
 * RabbitMQ
 * Saga Pattern
 * Outbox Pattern
-* Redis
 * PostgreSQL
 * MongoDB
-* Docker
-* Kubernetes
+* Redis
 * OpenTelemetry
 * Prometheus
 * Grafana
+* Docker
+* Kubernetes
+* Next.js
+* BFF Pattern
 * API Gateway
-* CI/CD
-* Testes Automatizados
-* Observabilidade Distribuída
 
-Tudo documentado e pronto para apresentação em entrevistas técnicas e avaliação por recrutadores.
+em um cenário realista de e-commerce distribuído de nível corporativo.

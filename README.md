@@ -1,28 +1,33 @@
 # MicroCommerce
 
-> Plataforma de E-commerce baseada em Microservices desenvolvida com .NET 8, RabbitMQ, PostgreSQL, MongoDB, Redis, Docker, Kubernetes e OpenTelemetry.
+Uma plataforma completa de e-commerce desenvolvida utilizando arquitetura moderna baseada em Microservices.
+
+O objetivo deste projeto é demonstrar a implementação de conceitos avançados de engenharia de software utilizados em sistemas distribuídos de larga escala.
 
 ---
 
-# Sobre o Projeto
+# Objetivos do Projeto
 
-MicroCommerce é um projeto de portfólio criado para demonstrar a implementação de uma arquitetura moderna de Microservices utilizando práticas adotadas em sistemas distribuídos de alta escala.
-
-O objetivo não é apenas construir um e-commerce funcional, mas demonstrar conhecimentos em:
+Este projeto foi criado para demonstrar experiência prática com:
 
 * Microservices
 * Domain Driven Design (DDD)
 * Clean Architecture
 * CQRS
 * Event Driven Architecture
-* RabbitMQ
 * Saga Pattern
 * Outbox Pattern
-* Redis
 * API Gateway
-* Observabilidade
-* Kubernetes
+* Backend For Frontend (BFF)
+* RabbitMQ
+* Redis
+* PostgreSQL
+* MongoDB
 * Docker
+* Kubernetes
+* OpenTelemetry
+* Prometheus
+* Grafana
 * Testes Automatizados
 
 ---
@@ -30,55 +35,66 @@ O objetivo não é apenas construir um e-commerce funcional, mas demonstrar conh
 # Arquitetura
 
 ```text
-                           Client
-                              |
-                              v
-                       API Gateway
-                              |
-    -----------------------------------------------------
-    |           |           |          |                |
-    v           v           v          v                v
-
- Auth     Customer    Catalog    Cart       Order
- Service   Service    Service    Service    Service
-
+Browser
+   |
+Next.js Frontend
+   |
+Web BFF
+   |
+API Gateway
+   |
+-----------------------------------------------------
+|         |          |          |         |          |
+Auth   Customer   Catalog     Cart      Order   Inventory
                                           |
-                                          v
                                        RabbitMQ
                                           |
-                     ------------------------------------
-                     |                |                |
-                     v                v                v
-
-                Inventory      Payment       Notification
-                 Service       Service          Service
-
-                                          |
-                                          v
-
-                                     Audit Service
+                         ----------------------------
+                         |            |             |
+                      Payment   Notification     Audit
 ```
 
 ---
 
 # Tecnologias
 
+## Frontend
+
+* Next.js 15
+* React 19
+* TypeScript
+* Tailwind CSS
+* Zustand
+* TanStack Query
+* Axios
+
+---
+
 ## Backend
 
 * .NET 8
-* ASP.NET Core Minimal APIs
+* ASP.NET Core
+* Minimal APIs
 * MediatR
 * FluentValidation
+* Serilog
+* Polly
 
-## Bancos de Dados
+---
+
+## Banco de Dados
 
 * PostgreSQL
 * MongoDB
 * Redis
 
+---
+
 ## Mensageria
 
 * RabbitMQ
+
+---
 
 ## Observabilidade
 
@@ -86,15 +102,120 @@ O objetivo não é apenas construir um e-commerce funcional, mas demonstrar conh
 * Prometheus
 * Grafana
 
+---
+
 ## Infraestrutura
 
 * Docker
 * Docker Compose
 * Kubernetes
 
-## API Gateway
+---
 
-* YARP Reverse Proxy
+# Principais Conceitos Implementados
+
+## Domain Driven Design (DDD)
+
+Separação dos domínios de negócio:
+
+* Auth
+* Customer
+* Catalog
+* Cart
+* Order
+* Inventory
+* Payment
+
+---
+
+## Clean Architecture
+
+Todos os serviços seguem a estrutura:
+
+```text
+Service
+
+├── Api
+├── Application
+├── Domain
+├── Infrastructure
+└── Tests
+```
+
+---
+
+## CQRS
+
+Separação entre:
+
+* Commands
+* Queries
+
+Exemplo:
+
+```text
+CreateOrderCommand
+GetOrderByIdQuery
+```
+
+---
+
+## Event Driven Architecture
+
+Integração entre microservices realizada através de eventos.
+
+Exemplos:
+
+```text
+OrderCreated
+InventoryReserved
+PaymentApproved
+OrderConfirmed
+```
+
+---
+
+## Saga Pattern
+
+Fluxo principal:
+
+```text
+OrderCreated
+      |
+InventoryReserved
+      |
+PaymentApproved
+      |
+OrderConfirmed
+```
+
+Fluxo de compensação:
+
+```text
+PaymentRejected
+      |
+InventoryReleased
+      |
+OrderCancelled
+```
+
+---
+
+## Outbox Pattern
+
+Garantia de consistência entre banco de dados e RabbitMQ.
+
+```text
+Save Aggregate
+      |
+Save Outbox Event
+      |
+Commit Transaction
+      |
+Dispatcher
+      |
+RabbitMQ
+```
 
 ---
 
@@ -104,7 +225,7 @@ O objetivo não é apenas construir um e-commerce funcional, mas demonstrar conh
 
 Responsável por:
 
-* Registro
+* Cadastro
 * Login
 * JWT
 * Refresh Token
@@ -135,7 +256,9 @@ Responsável por:
 
 * Carrinho de compras
 
-Utiliza Redis.
+Persistência:
+
+* Redis
 
 ---
 
@@ -144,8 +267,7 @@ Utiliza Redis.
 Responsável por:
 
 * Pedidos
-* Estados do pedido
-* Publicação de eventos
+* Orquestração da Saga
 
 ---
 
@@ -154,8 +276,7 @@ Responsável por:
 Responsável por:
 
 * Estoque
-* Reserva de estoque
-* Liberação de estoque
+* Reservas
 
 ---
 
@@ -171,8 +292,8 @@ Responsável por:
 
 Responsável por:
 
-* E-mails
 * Notificações
+* E-mails
 
 ---
 
@@ -181,80 +302,79 @@ Responsável por:
 Responsável por:
 
 * Auditoria
-* Rastreamento de eventos
+* Histórico de eventos
 
 ---
 
-# Event Driven Architecture
+# Frontend
 
-Os serviços se comunicam através de eventos publicados no RabbitMQ.
+Funcionalidades disponíveis:
 
-Exemplo:
+* Cadastro de usuário
+* Login
+* Catálogo de produtos
+* Busca de produtos
+* Carrinho de compras
+* Checkout
+* Histórico de pedidos
+
+---
+
+# BFF
+
+O Frontend nunca acessa diretamente os microservices.
+
+Fluxo:
 
 ```text
-OrderCreated
-      |
-      v
-RabbitMQ
-      |
-      +------------------+
-      |                  |
-      v                  v
-Inventory          Audit
+Frontend
+    |
+BFF
+    |
+Gateway
+    |
+Microservices
 ```
+
+Responsabilidades:
+
+* Agregação de chamadas
+* Cache
+* View Models
+* Autenticação
 
 ---
 
-# Saga Pattern
+# Banco de Dados por Serviço
 
-Fluxo principal:
-
-```text
-Pedido Criado
-      |
-Reserva Estoque
-      |
-Pagamento
-      |
-Pedido Confirmado
-```
-
-Fluxo de compensação:
-
-```text
-Pagamento Falhou
-       |
-Libera Estoque
-       |
-Cancela Pedido
-```
-
-Objetivo:
-
-Garantir consistência eventual entre múltiplos serviços.
+| Serviço   | Banco      |
+| --------- | ---------- |
+| Auth      | PostgreSQL |
+| Customer  | PostgreSQL |
+| Catalog   | PostgreSQL |
+| Order     | PostgreSQL |
+| Inventory | PostgreSQL |
+| Cart      | Redis      |
+| Payment   | MongoDB    |
+| Audit     | MongoDB    |
 
 ---
 
-# Outbox Pattern
-
-Todos os eventos são persistidos localmente antes da publicação.
-
-Benefícios:
-
-* Evita perda de mensagens
-* Garante consistência
-* Suporta reprocessamento
-
----
-
-# Estrutura do Repositório
+# Estrutura do Projeto
 
 ```text
 microcommerce/
 
 src/
 
+├── frontend/
+│   └── web/
+│
+├── bff/
+│   └── web-bff/
+│
 ├── gateway/
+│   └── api-gateway/
 │
 ├── services/
 │   ├── auth-service/
@@ -268,60 +388,55 @@ src/
 │   └── audit-service/
 │
 ├── building-blocks/
-│   ├── shared-kernel/
-│   ├── contracts/
-│   ├── event-bus/
-│   ├── observability/
-│   └── outbox/
+│
+├── tests/
+│
+├── docs/
 │
 ├── docker/
 │
-├── k8s/
-│
-└── docs/
+└── k8s/
 ```
 
 ---
 
-# Banco por Serviço
+# Como Executar
 
-Cada microservice possui seu próprio banco.
+## Pré-requisitos
 
-| Serviço   | Banco      |
-| --------- | ---------- |
-| Auth      | PostgreSQL |
-| Customer  | PostgreSQL |
-| Catalog   | PostgreSQL |
-| Order     | PostgreSQL |
-| Inventory | PostgreSQL |
-| Payment   | MongoDB    |
-| Audit     | MongoDB    |
-| Cart      | Redis      |
-
-Nenhum serviço acessa diretamente o banco de outro serviço.
+* Docker
+* Docker Compose
+* .NET 8 SDK
+* Node.js 22+
 
 ---
 
-# CQRS
+## Subir infraestrutura
 
-Todos os serviços seguem CQRS.
-
-Exemplo:
-
-## Commands
-
-```csharp
-CreateOrderCommand
-UpdateProductCommand
-CreateCustomerCommand
+```bash
+docker compose up -d
 ```
 
-## Queries
+---
 
-```csharp
-GetOrderByIdQuery
-GetProductsQuery
-GetCustomerQuery
+## Executar Backend
+
+```bash
+dotnet build
+
+dotnet run
+```
+
+---
+
+## Executar Frontend
+
+```bash
+cd src/frontend/web
+
+npm install
+
+npm run dev
 ```
 
 ---
@@ -336,94 +451,11 @@ GET /health
 GET /metrics
 ```
 
-Monitoramento realizado através de:
+Ferramentas utilizadas:
 
 * OpenTelemetry
 * Prometheus
 * Grafana
-
----
-
-# Métricas Monitoradas
-
-## APIs
-
-* Requests por segundo
-* Tempo médio de resposta
-* Erros por endpoint
-
-## RabbitMQ
-
-* Tamanho das filas
-* Taxa de consumo
-* Taxa de publicação
-
-## Banco de Dados
-
-* Conexões ativas
-* Tempo médio de consultas
-
----
-
-# Executando Localmente
-
-## Pré-requisitos
-
-* Docker
-* Docker Compose
-* .NET 8 SDK
-
----
-
-## Clonar Repositório
-
-```bash
-git clone https://github.com/seuusuario/microcommerce.git
-
-cd microcommerce
-```
-
----
-
-## Subir Infraestrutura
-
-```bash
-docker compose up -d
-```
-
----
-
-## Verificar Containers
-
-```bash
-docker ps
-```
-
----
-
-## Executar Serviços
-
-```bash
-dotnet build
-
-dotnet run
-```
-
----
-
-# Ambientes
-
-## Desenvolvimento
-
-Docker Compose
-
-## Homologação
-
-Kubernetes
-
-## Produção
-
-Kubernetes
 
 ---
 
@@ -435,63 +467,120 @@ Executar todos os testes:
 dotnet test
 ```
 
-Cobertura mínima esperada:
+Cobertura mínima:
 
 ```text
 80%
 ```
 
+Tipos de teste:
+
+* Unit Tests
+* Integration Tests
+* End-to-End Tests
+
+---
+
+# Documentação
+
+Documentos disponíveis:
+
+* AGENTS.md
+* ARCHITECTURE.md
+* SYSTEM_DESIGN.md
+* EVENT_CATALOG.md
+* ADR.md
+* SPRINT_PLAN.md
+
 ---
 
 # Roadmap
 
-* [x] Arquitetura definida
-* [ ] Shared Kernel
-* [ ] Contracts
-* [ ] RabbitMQ
-* [ ] Auth Service
-* [ ] Customer Service
-* [ ] Catalog Service
-* [ ] Cart Service
-* [ ] Order Service
-* [ ] Inventory Service
-* [ ] Payment Service
-* [ ] Notification Service
-* [ ] Audit Service
-* [ ] Saga Pattern
-* [ ] Outbox Pattern
-* [ ] OpenTelemetry
-* [ ] Grafana
-* [ ] Prometheus
-* [ ] API Gateway
-* [ ] Kubernetes
+## Fase 1
 
----
+* Foundation
+* Auth
+* Customer
+* Catalog
 
-# Conceitos Demonstrados
+## Fase 2
 
-* Microservices
-* DDD
-* Clean Architecture
-* CQRS
-* Event Driven Architecture
-* Saga Pattern
-* Outbox Pattern
+* Cart
+* Order
+* Inventory
+
+## Fase 3
+
 * RabbitMQ
-* Redis
-* PostgreSQL
-* MongoDB
-* Docker
-* Kubernetes
+* Saga
+* Payment
+
+## Fase 4
+
+* Notification
+* Audit
+
+## Fase 5
+
+* Gateway
+* BFF
+* Frontend
+
+## Fase 6
+
 * OpenTelemetry
 * Prometheus
 * Grafana
-* API Gateway
-* Resiliência Distribuída
-* Observabilidade
+
+## Fase 7
+
+* Kubernetes
+* CI/CD
+
+---
+
+# Diferenciais Técnicos
+
+Este projeto demonstra na prática:
+
+✅ Microservices
+
+✅ DDD
+
+✅ Clean Architecture
+
+✅ CQRS
+
+✅ RabbitMQ
+
+✅ Saga Pattern
+
+✅ Outbox Pattern
+
+✅ API Gateway
+
+✅ BFF Pattern
+
+✅ Redis
+
+✅ PostgreSQL
+
+✅ MongoDB
+
+✅ Docker
+
+✅ Kubernetes
+
+✅ OpenTelemetry
+
+✅ Prometheus
+
+✅ Grafana
+
+✅ Testes Automatizados
 
 ---
 
 # Autor
 
-Projeto desenvolvido para fins de estudo, portfólio e demonstração de conhecimentos avançados em arquitetura de software e sistemas distribuídos.
+Desenvolvido como projeto de estudo e portfólio profissional para demonstração de arquitetura distribuída moderna utilizando .NET, Next.js e tecnologias cloud-native.

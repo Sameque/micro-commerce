@@ -1,112 +1,64 @@
-## Projeto
+# AGENTS.md
 
-**MicroCommerce**
+# MicroCommerce
 
-Plataforma de e-commerce desenvolvida utilizando arquitetura de Microservices com .NET 8, Event-Driven Architecture, RabbitMQ, Docker, Kubernetes e observabilidade completa.
+## Objetivo
 
-O objetivo principal deste projeto é demonstrar conhecimentos avançados em:
+Construir uma plataforma completa de e-commerce utilizando arquitetura moderna baseada em Microservices.
+
+O projeto será utilizado como portfólio profissional e deverá demonstrar competências avançadas em:
 
 * Microservices
-* Domain Driven Design (DDD)
+* DDD
 * Clean Architecture
 * CQRS
-* Event-Driven Architecture
+* Event Driven Architecture
 * Saga Pattern
 * Outbox Pattern
 * RabbitMQ
 * Redis
 * PostgreSQL
 * MongoDB
-* OpenTelemetry
-* Prometheus
-* Grafana
 * Docker
 * Kubernetes
-* API Gateway
-
-Este projeto será utilizado como portfólio profissional e deverá seguir boas práticas de arquitetura e engenharia de software.
-
----
-
-# Objetivos Arquiteturais
-
-O sistema deve demonstrar:
-
-* Independência entre serviços
-* Banco de dados por serviço
-* Comunicação síncrona via HTTP/gRPC
-* Comunicação assíncrona via RabbitMQ
-* Consistência eventual
-* Escalabilidade horizontal
-* Observabilidade distribuída
-* Resiliência
-* Separação clara de responsabilidades
-
----
-
-# Stack Tecnológica
-
-## Backend
-
-* .NET 8
-* ASP.NET Core
-* Minimal APIs
-
-## Arquitetura
-
-* Clean Architecture
-* DDD
-* CQRS
-* MediatR
-* FluentValidation
-
-## Mensageria
-
-* RabbitMQ
-
-## Banco de Dados
-
-### PostgreSQL
-
-Utilizar para:
-
-* Auth Service
-* Customer Service
-* Catalog Service
-* Order Service
-* Inventory Service
-
-### MongoDB
-
-Utilizar para:
-
-* Payment Service
-* Audit Service
-
-### Redis
-
-Utilizar para:
-
-* Cart Service
-* Cache distribuído
-
-## Gateway
-
-YARP Reverse Proxy
-
-## Observabilidade
-
 * OpenTelemetry
 * Prometheus
 * Grafana
+* API Gateway
+* BFF Pattern
+* Next.js
 
-## Containerização
+O projeto deve priorizar:
 
-Docker
+* Qualidade arquitetural
+* Clareza de implementação
+* Documentação
+* Boas práticas
+* Testabilidade
 
-## Orquestração
+---
 
-Kubernetes
+# Arquitetura Geral
+
+```text
+Browser
+   |
+Next.js Frontend
+   |
+Web BFF
+   |
+API Gateway
+   |
+-----------------------------------------------------
+|         |          |          |         |          |
+Auth   Customer   Catalog     Cart      Order   Inventory
+                                          |
+                                       RabbitMQ
+                                          |
+                         ----------------------------
+                         |            |             |
+                      Payment   Notification     Audit
+```
 
 ---
 
@@ -117,7 +69,14 @@ microcommerce/
 
 src/
 
+├── frontend/
+│   └── web/
+│
+├── bff/
+│   └── web-bff/
+│
 ├── gateway/
+│   └── api-gateway/
 │
 ├── services/
 │   ├── auth-service/
@@ -125,8 +84,8 @@ src/
 │   ├── catalog-service/
 │   ├── cart-service/
 │   ├── order-service/
-│   ├── payment-service/
 │   ├── inventory-service/
+│   ├── payment-service/
 │   ├── notification-service/
 │   └── audit-service/
 │
@@ -137,76 +96,318 @@ src/
 │   ├── observability/
 │   └── outbox/
 │
+├── tests/
+│
+├── docs/
+│
 ├── docker/
 │
-├── k8s/
-│
-└── docs/
+└── k8s/
 ```
 
 ---
 
-# Padrão Interno dos Serviços
+# Regras Gerais
 
-Todos os microservices devem utilizar a seguinte estrutura:
+## Obrigatório
 
-```text
-ServiceName
+Todos os serviços devem possuir:
 
-src/
-
-├── Api
-├── Application
-├── Domain
-├── Infrastructure
-└── Tests
-```
+* Dockerfile
+* Swagger
+* Health Check
+* Structured Logging
+* OpenTelemetry
+* Unit Tests
+* Integration Tests
 
 ---
 
-# Regras Obrigatórias
+## Proibido
 
-## Banco por Serviço
+Não compartilhar banco entre serviços.
 
-Cada microservice deve possuir seu próprio banco.
+Não compartilhar entidades entre serviços.
 
-Nunca compartilhar banco de dados entre serviços.
+Não realizar consultas SQL entre domínios.
 
-Comunicação entre serviços deve ocorrer exclusivamente via:
+Não utilizar comunicação direta via banco.
+
+Toda integração entre domínios deve ocorrer por:
 
 * API
 * Eventos
 
 ---
 
-## Acoplamento
+# Backend Stack
 
-Evitar dependências diretas entre serviços.
+## Framework
 
-Preferir:
+* .NET 8
 
-* Eventos de domínio
-* Contratos compartilhados
+## APIs
+
+* ASP.NET Core
+* Minimal APIs
+
+## Arquitetura
+
+* DDD
+* Clean Architecture
+* CQRS
+* MediatR
+* FluentValidation
+
+## Resiliência
+
+* Polly
+* Retry
+* Circuit Breaker
+* Timeout
 
 ---
 
-## Contratos
+# Frontend Stack
 
-Todos os contratos de eventos devem ficar em:
+## Framework
+
+* Next.js 15
+
+## Linguagem
+
+* TypeScript
+
+## UI
+
+* Tailwind CSS
+
+## Estado Global
+
+* Zustand
+
+## Server State
+
+* TanStack Query
+
+## HTTP
+
+* Axios
+
+---
+
+# BFF Stack
+
+## Framework
+
+* .NET 8
+
+## APIs
+
+* Minimal APIs
+
+## Responsabilidades
+
+* Agregação de endpoints
+* Orquestração de chamadas
+* Cache
+* View Models
+* Autenticação
+* Redução de chamadas do frontend
+
+---
+
+# Banco de Dados
+
+## PostgreSQL
+
+Utilizar para:
+
+* Auth Service
+* Customer Service
+* Catalog Service
+* Order Service
+* Inventory Service
+
+---
+
+## MongoDB
+
+Utilizar para:
+
+* Payment Service
+* Audit Service
+
+---
+
+## Redis
+
+Utilizar para:
+
+* Cart Service
+* Cache Distribuído
+* Sessões
+
+---
+
+# Mensageria
+
+## RabbitMQ
+
+Utilizar para:
+
+* Integração entre domínios
+* Saga Pattern
+* Eventos de negócio
+
+---
+
+# Shared Kernel
+
+Localização:
+
+```text
+building-blocks/shared-kernel
+```
+
+Implementar:
+
+* Entity
+* AggregateRoot
+* ValueObject
+* Result
+* DomainEvent
+
+---
+
+# Contracts
+
+Localização:
 
 ```text
 building-blocks/contracts
 ```
 
+Implementar:
+
+* Integration Events
+* Event Metadata
+* CorrelationId
+* Event Version
+
+Todos os eventos devem ser imutáveis.
+
+Utilizar record.
+
 Exemplo:
 
 ```csharp
 public record OrderCreatedEvent(
+    Guid EventId,
+    Guid CorrelationId,
+    DateTime OccurredAt,
+    int Version,
     Guid OrderId,
     Guid CustomerId,
     decimal TotalAmount
 );
 ```
+
+---
+
+# API Gateway
+
+Responsável por:
+
+* Roteamento
+* JWT Validation
+* Rate Limiting
+* Observabilidade
+
+Tecnologia:
+
+* YARP
+
+---
+
+# Frontend
+
+## Funcionalidades
+
+### Home
+
+* Produtos em destaque
+* Categorias
+
+### Catálogo
+
+* Listagem de produtos
+* Busca
+* Filtro
+
+### Produto
+
+* Detalhes
+* Adicionar ao carrinho
+
+### Carrinho
+
+* Adicionar item
+* Remover item
+* Atualizar quantidade
+
+### Checkout
+
+* Finalizar compra
+
+### Conta
+
+* Login
+* Cadastro
+
+### Pedidos
+
+* Histórico de pedidos
+
+---
+
+# BFF
+
+## Endpoints
+
+### Catálogo
+
+```http
+GET /catalog
+GET /catalog/{id}
+```
+
+### Carrinho
+
+```http
+GET /cart
+POST /cart
+DELETE /cart
+```
+
+### Pedido
+
+```http
+POST /checkout
+GET /orders
+GET /orders/{id}
+```
+
+### Usuário
+
+```http
+POST /login
+POST /register
+```
+
+O frontend nunca deve consumir diretamente os microservices.
+
+Toda comunicação deve passar pelo BFF.
 
 ---
 
@@ -216,22 +417,14 @@ public record OrderCreatedEvent(
 
 Responsabilidades:
 
-* Registro de usuário
+* Registro
 * Login
-* Refresh Token
 * JWT
+* Refresh Token
 
 Banco:
 
 PostgreSQL
-
-Endpoints:
-
-```http
-POST /register
-POST /login
-POST /refresh-token
-```
 
 ---
 
@@ -254,7 +447,6 @@ Responsabilidades:
 
 * Produtos
 * Categorias
-* Consulta de catálogo
 
 Banco:
 
@@ -266,7 +458,7 @@ PostgreSQL
 
 Responsabilidades:
 
-* Carrinho de compras
+* Carrinho
 
 Banco:
 
@@ -278,8 +470,7 @@ Redis
 
 Responsabilidades:
 
-* Criação de pedidos
-* Consulta de pedidos
+* Pedidos
 
 Banco:
 
@@ -287,11 +478,9 @@ PostgreSQL
 
 Eventos:
 
-```text
-OrderCreated
-OrderCancelled
-OrderPaid
-```
+* OrderCreated
+* OrderConfirmed
+* OrderCancelled
 
 ---
 
@@ -299,8 +488,8 @@ OrderPaid
 
 Responsabilidades:
 
-* Reserva de estoque
-* Liberação de estoque
+* Estoque
+* Reserva
 
 Banco:
 
@@ -308,11 +497,9 @@ PostgreSQL
 
 Eventos:
 
-```text
-InventoryReserved
-InventoryReleased
-InventoryFailed
-```
+* InventoryReserved
+* InventoryReleased
+* InventoryFailed
 
 ---
 
@@ -320,7 +507,7 @@ InventoryFailed
 
 Responsabilidades:
 
-* Processamento de pagamento
+* Processamento de pagamentos
 
 Banco:
 
@@ -328,10 +515,8 @@ MongoDB
 
 Eventos:
 
-```text
-PaymentApproved
-PaymentRejected
-```
+* PaymentApproved
+* PaymentRejected
 
 ---
 
@@ -339,12 +524,9 @@ PaymentRejected
 
 Responsabilidades:
 
-* E-mail
 * Notificações
 
 Consumidor de eventos.
-
-Inicialmente sem banco.
 
 ---
 
@@ -353,81 +535,12 @@ Inicialmente sem banco.
 Responsabilidades:
 
 * Auditoria
-* Rastreamento de eventos
+
+Consumidor de todos os eventos.
 
 Banco:
 
 MongoDB
-
-Consumir todos os eventos publicados.
-
----
-
-# Event Driven Architecture
-
-RabbitMQ deve ser utilizado para integração entre serviços.
-
-Fluxo principal:
-
-```text
-Order Service
-      |
-      v
-OrderCreated
-      |
-      v
-RabbitMQ
-      |
-      +------------------+
-      |                  |
-      v                  v
-Inventory          Payment
-```
-
----
-
-# Saga Pattern
-
-Implementar Saga Orquestrada.
-
-Fluxo:
-
-```text
-Pedido Criado
-      |
-Reserva Estoque
-      |
-Pagamento
-      |
-Pedido Confirmado
-```
-
-Fluxo de compensação:
-
-```text
-Pagamento Falhou
-      |
-Libera Estoque
-      |
-Cancela Pedido
-```
-
-Eventos de compensação devem ser implementados.
-
----
-
-# Outbox Pattern
-
-Todos os eventos publicados devem utilizar Outbox Pattern.
-
-Objetivo:
-
-Garantir consistência entre:
-
-* Persistência local
-* Publicação de eventos
-
-Nenhum evento deve ser publicado diretamente após SaveChanges.
 
 ---
 
@@ -435,20 +548,74 @@ Nenhum evento deve ser publicado diretamente após SaveChanges.
 
 Todos os serviços devem separar:
 
-Commands:
+## Commands
+
+Exemplos:
 
 ```text
 CreateOrderCommand
 CreateCustomerCommand
-UpdateProductCommand
+CreateProductCommand
 ```
 
-Queries:
+## Queries
+
+Exemplos:
 
 ```text
 GetOrderByIdQuery
-GetProductsQuery
 GetCustomerQuery
+GetProductsQuery
+```
+
+---
+
+# Saga Pattern
+
+Fluxo principal:
+
+```text
+OrderCreated
+      |
+InventoryReserved
+      |
+PaymentApproved
+      |
+OrderConfirmed
+```
+
+Fluxo de compensação:
+
+```text
+PaymentRejected
+      |
+InventoryReleased
+      |
+OrderCancelled
+```
+
+Utilizar Saga Orquestrada.
+
+---
+
+# Outbox Pattern
+
+Obrigatório.
+
+Nenhum evento pode ser publicado diretamente após SaveChanges.
+
+Fluxo:
+
+```text
+Save Aggregate
+      |
+Save Outbox Event
+      |
+Commit Transaction
+      |
+Background Dispatcher
+      |
+RabbitMQ
 ```
 
 ---
@@ -457,58 +624,37 @@ GetCustomerQuery
 
 Todos os serviços devem expor:
 
-```text
-/health
-/metrics
+```http
+GET /health
+
+GET /metrics
 ```
 
-Instrumentação obrigatória:
+Instrumentar:
 
-* Traces
-* Metrics
-* Logs
+* HTTP
+* RabbitMQ
+* PostgreSQL
+* MongoDB
+* Redis
 
-Utilizar OpenTelemetry.
+Utilizar:
 
----
-
-# API Gateway
-
-Implementar YARP.
-
-Responsabilidades:
-
-* Roteamento
-* Rate Limiting
-* Autenticação
-
-Exemplo:
-
-```text
-/api/customers
-/api/orders
-/api/products
-```
+* OpenTelemetry
+* Prometheus
+* Grafana
 
 ---
 
 # Docker
 
-Todos os serviços devem possuir:
+Todos os projetos devem possuir Dockerfile.
 
-```text
-Dockerfile
-```
+Deve existir docker-compose.yml contendo:
 
-Deve existir:
-
-```text
-docker-compose.yml
-```
-
-Subindo:
-
-* APIs
+* Frontend
+* BFF
+* Gateway
 * RabbitMQ
 * PostgreSQL
 * MongoDB
@@ -539,27 +685,24 @@ Estrutura:
 ```text
 k8s/
 
-├── auth-service
-├── customer-service
-├── catalog-service
-├── order-service
-├── payment-service
-├── inventory-service
-├── notification-service
-└── gateway
+frontend/
+bff/
+gateway/
+
+auth-service/
+customer-service/
+catalog-service/
+cart-service/
+order-service/
+inventory-service/
+payment-service/
+notification-service/
+audit-service/
 ```
 
 ---
 
-# Qualidade de Código
-
-Obrigatório:
-
-* SOLID
-* Clean Code
-* Dependency Injection
-* Unit Tests
-* Integration Tests
+# Testes
 
 Cobertura mínima:
 
@@ -567,96 +710,29 @@ Cobertura mínima:
 80%
 ```
 
----
+Implementar:
 
-# Convenções
+## Unit Tests
 
-Namespaces:
+* Domain
+* Application
 
-```csharp
-MicroCommerce.ServiceName.*
-```
+## Integration Tests
 
-Exemplo:
-
-```csharp
-MicroCommerce.OrderService.Domain
-MicroCommerce.OrderService.Application
-MicroCommerce.OrderService.Infrastructure
-```
-
----
-
-# Roadmap de Implementação
-
-## Fase 1
-
-Infraestrutura Base
-
-* Solution
-* Shared Kernel
-* Contracts
-* Docker Compose
-* RabbitMQ
 * PostgreSQL
 * MongoDB
 * Redis
+* RabbitMQ
 
-## Fase 2
+## End-to-End Tests
 
-Auth Service
+Fluxos:
 
-## Fase 3
-
-Customer Service
-
-## Fase 4
-
-Catalog Service
-
-## Fase 5
-
-Cart Service
-
-## Fase 6
-
-Order Service
-
-## Fase 7
-
-Inventory Service
-
-## Fase 8
-
-Payment Service
-
-## Fase 9
-
-Notification Service
-
-## Fase 10
-
-Audit Service
-
-## Fase 11
-
-Saga Pattern
-
-## Fase 12
-
-Outbox Pattern
-
-## Fase 13
-
-Observabilidade
-
-## Fase 14
-
-API Gateway
-
-## Fase 15
-
-Kubernetes
+* Login
+* Cadastro
+* Compra
+* Checkout
+* Consulta de pedidos
 
 ---
 
@@ -664,13 +740,16 @@ Kubernetes
 
 O projeto será considerado concluído quando:
 
-* Todos os microservices estiverem independentes.
-* RabbitMQ estiver funcionando.
-* Saga Pattern estiver implementada.
-* Outbox Pattern estiver implementada.
-* Observabilidade estiver funcionando.
-* Docker Compose subir todo o ambiente.
-* Kubernetes possuir manifests completos.
-* Existirem testes automatizados.
-* Toda arquitetura estiver documentada em `/docs`.
-* O projeto puder ser apresentado como exemplo de arquitetura moderna de microservices em entrevistas técnicas.
+* Frontend funcional.
+* BFF funcional.
+* Gateway funcional.
+* Todos os microservices independentes.
+* RabbitMQ funcionando.
+* Saga Pattern implementada.
+* Outbox Pattern implementada.
+* Observabilidade funcionando.
+* Docker Compose funcional.
+* Kubernetes funcional.
+* Testes automatizados passando.
+* Documentação completa.
+* Projeto apto para demonstração em entrevistas técnicas.

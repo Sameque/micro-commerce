@@ -1,561 +1,1039 @@
-# MicroCommerce
+# BACKLOG.md
 
-## Visão Geral
+# MicroCommerce Product Backlog
 
-Objetivo:
+## Objetivo
 
-Construir uma plataforma de e-commerce baseada em microservices para demonstrar conhecimentos avançados em:
+Este documento contém o backlog completo do projeto MicroCommerce.
 
-* .NET 8
-* Microservices
-* DDD
-* Clean Architecture
-* CQRS
-* RabbitMQ
-* Redis
-* PostgreSQL
-* MongoDB
-* Docker
-* Kubernetes
-* OpenTelemetry
-* Prometheus
-* Grafana
-* Saga Pattern
-* Outbox Pattern
+Os itens estão organizados em:
+
+* Épicos
+* Features
+* User Stories
+* Dependências
+
+Prioridade:
+
+* P0 = Crítico
+* P1 = Alta
+* P2 = Média
+* P3 = Baixa
 
 ---
 
 # EPIC 01 - Foundation
 
-## Feature 1.1 - Estrutura Inicial
+## Objetivo
 
-### Task
+Preparar toda a estrutura inicial do projeto.
 
-Criar estrutura do monorepo.
+Prioridade:
 
-### Critérios
-
-* Criar solution principal.
-* Criar pasta services.
-* Criar pasta gateway.
-* Criar pasta building-blocks.
-* Criar pasta docs.
-* Criar pasta docker.
-* Criar pasta k8s.
+P0
 
 ---
 
-## Feature 1.2 - Shared Kernel
+### FEATURE 01.01
 
-### Task
+Criar estrutura do repositório.
 
-Criar biblioteca compartilhada.
+#### User Stories
 
-### Critérios
+* Como desenvolvedor quero uma estrutura organizada para suportar múltiplos serviços.
 
-Implementar:
+---
+
+### FEATURE 01.02
+
+Configurar solução .NET.
+
+#### User Stories
+
+* Como desenvolvedor quero uma solution única para facilitar o desenvolvimento.
+
+---
+
+### FEATURE 01.03
+
+Criar Shared Kernel.
+
+#### User Stories
+
+* Como desenvolvedor quero reutilizar componentes básicos entre serviços.
+
+Itens:
 
 * Entity
 * AggregateRoot
 * ValueObject
+* Result
 * DomainEvent
-* Result Pattern
 
 ---
 
-## Feature 1.3 - Contracts
+### FEATURE 01.04
 
-### Task
+Criar Contracts.
 
-Criar biblioteca de contratos.
+Itens:
 
-### Critérios
-
-Implementar:
-
-* BaseIntegrationEvent
-* Event Metadata
+* IntegrationEvent
 * CorrelationId
 * EventVersion
 
 ---
 
-## Feature 1.4 - Docker Compose
+### FEATURE 01.05
 
-### Task
+Criar ambiente Docker.
 
-Criar ambiente local.
+Itens:
 
-### Critérios
-
-Subir:
-
-* RabbitMQ
 * PostgreSQL
 * MongoDB
 * Redis
+* RabbitMQ
 
 ---
 
 # EPIC 02 - Auth Service
 
-## Feature 2.1 - Estrutura
+Prioridade:
 
-### Task
-
-Criar Auth Service.
-
-### Critérios
-
-* Clean Architecture
-* Minimal API
-* PostgreSQL
+P0
 
 ---
 
-## Feature 2.2 - Registro
+### FEATURE 02.01
 
-### Task
+Cadastro de usuário.
 
-Implementar cadastro.
+#### User Stories
 
-### Critérios
-
-Endpoint:
-
-POST /register
+* Como usuário quero criar uma conta.
 
 ---
 
-## Feature 2.3 - Login
+### FEATURE 02.02
 
-### Task
+Login.
 
-Implementar autenticação.
+#### User Stories
 
-### Critérios
-
-Endpoint:
-
-POST /login
-
-Retornar JWT.
+* Como usuário quero autenticar no sistema.
 
 ---
 
-## Feature 2.4 - Refresh Token
+### FEATURE 02.03
 
-### Task
+Refresh Token.
 
-Implementar renovação de token.
+#### User Stories
+
+* Como usuário quero renovar minha sessão sem novo login.
+
+---
+
+### FEATURE 02.04
+
+JWT Authentication.
 
 ---
 
 # EPIC 03 - Customer Service
 
-## Feature 3.1 - Cliente
+Prioridade:
 
-### Tasks
-
-* Criar Cliente
-* Atualizar Cliente
-* Consultar Cliente
+P0
 
 ---
 
-## Feature 3.2 - Endereços
+### FEATURE 03.01
 
-### Tasks
-
-* Adicionar endereço
-* Atualizar endereço
-* Remover endereço
+Cadastro de cliente.
 
 ---
 
-## Feature 3.3 - Eventos
+### FEATURE 03.02
 
-### Tasks
+Atualização de cliente.
 
-Publicar:
+---
 
-* CustomerCreated
+### FEATURE 03.03
+
+CRUD de endereço.
+
+---
+
+### FEATURE 03.04
+
+Publicação de evento CustomerCreated.
 
 ---
 
 # EPIC 04 - Catalog Service
 
-## Feature 4.1 - Categorias
+Prioridade:
 
-### Tasks
-
-CRUD completo.
+P0
 
 ---
 
-## Feature 4.2 - Produtos
+### FEATURE 04.01
 
-### Tasks
-
-CRUD completo.
+Cadastro de categorias.
 
 ---
 
-## Feature 4.3 - Busca
+### FEATURE 04.02
 
-### Tasks
-
-* Busca por nome
-* Busca por categoria
+Cadastro de produtos.
 
 ---
 
-## Feature 4.4 - Eventos
+### FEATURE 04.03
 
-### Tasks
+Atualização de produtos.
 
-Publicar:
+---
 
-* ProductCreated
-* ProductUpdated
+### FEATURE 04.04
+
+Busca de produtos.
+
+---
+
+### FEATURE 04.05
+
+Filtro por categoria.
+
+---
+
+### FEATURE 04.06
+
+Eventos ProductCreated.
+
+---
+
+### FEATURE 04.07
+
+Eventos ProductUpdated.
 
 ---
 
 # EPIC 05 - Cart Service
 
-## Feature 5.1 - Carrinho
+Prioridade:
 
-### Tasks
-
-* Adicionar item
-* Remover item
-* Limpar carrinho
+P0
 
 ---
 
-## Feature 5.2 - Redis
+### FEATURE 05.01
 
-### Tasks
-
-Persistir carrinho em Redis.
+Criar carrinho.
 
 ---
 
-# EPIC 06 - Inventory Service
+### FEATURE 05.02
 
-## Feature 6.1 - Estoque
-
-### Tasks
-
-* Entrada de estoque
-* Saída de estoque
+Adicionar item.
 
 ---
 
-## Feature 6.2 - Reserva
+### FEATURE 05.03
 
-### Tasks
-
-* Reservar estoque
-* Liberar estoque
+Remover item.
 
 ---
 
-## Feature 6.3 - Eventos
+### FEATURE 05.04
 
-Publicar:
+Atualizar quantidade.
 
-* InventoryReserved
-* InventoryReleased
-* InventoryFailed
+---
+
+### FEATURE 05.05
+
+Persistência Redis.
+
+---
+
+# EPIC 06 - RabbitMQ Infrastructure
+
+Prioridade:
+
+P0
+
+---
+
+### FEATURE 06.01
+
+Configurar exchanges.
+
+---
+
+### FEATURE 06.02
+
+Configurar filas.
+
+---
+
+### FEATURE 06.03
+
+Implementar consumers.
+
+---
+
+### FEATURE 06.04
+
+Implementar publisher.
+
+---
+
+### FEATURE 06.05
+
+Retry Policy.
+
+---
+
+### FEATURE 06.06
+
+Dead Letter Queue.
 
 ---
 
 # EPIC 07 - Order Service
 
-## Feature 7.1 - Pedido
+Prioridade:
 
-### Tasks
-
-* Criar pedido
-* Consultar pedido
+P0
 
 ---
 
-## Feature 7.2 - Estados
+### FEATURE 07.01
 
-Implementar:
-
-* Pending
-* Reserved
-* Paid
-* Confirmed
-* Cancelled
+Criar pedido.
 
 ---
 
-## Feature 7.3 - Eventos
+### FEATURE 07.02
 
-Publicar:
-
-* OrderCreated
-* OrderConfirmed
-* OrderCancelled
+Consultar pedido.
 
 ---
 
-# EPIC 08 - Payment Service
+### FEATURE 07.03
 
-## Feature 8.1 - Pagamento
-
-### Tasks
-
-Criar mock de gateway.
+Histórico de pedidos.
 
 ---
 
-## Feature 8.2 - Aprovação
+### FEATURE 07.04
 
-### Tasks
+Estados do pedido.
 
-Simular aprovação.
+Estados:
 
----
-
-## Feature 8.3 - Rejeição
-
-### Tasks
-
-Simular rejeição.
+```text
+Pending
+Confirmed
+Cancelled
+```
 
 ---
 
-## Feature 8.4 - Eventos
+### FEATURE 07.05
 
-Publicar:
-
-* PaymentApproved
-* PaymentRejected
+Evento OrderCreated.
 
 ---
 
-# EPIC 09 - Notification Service
+# EPIC 08 - Inventory Service
 
-## Feature 9.1 - Consumidor
+Prioridade:
 
-Consumir:
-
-* OrderConfirmed
-* OrderCancelled
+P0
 
 ---
 
-## Feature 9.2 - Email
+### FEATURE 08.01
 
-Implementar provedor fake.
-
----
-
-# EPIC 10 - Audit Service
-
-## Feature 10.1 - Auditoria
-
-Persistir todos os eventos.
-
-MongoDB.
+Controle de estoque.
 
 ---
 
-# EPIC 11 - RabbitMQ
+### FEATURE 08.02
 
-## Feature 11.1 - Publisher
-
-Implementar EventBus.
+Reserva de estoque.
 
 ---
 
-## Feature 11.2 - Consumer
+### FEATURE 08.03
 
-Implementar consumidor genérico.
-
----
-
-## Feature 11.3 - Retry
-
-Implementar retry.
+Liberação de estoque.
 
 ---
 
-## Feature 11.4 - Dead Letter
+### FEATURE 08.04
 
-Implementar DLQ.
-
----
-
-# EPIC 12 - CQRS
-
-## Feature 12.1 - Commands
-
-Implementar MediatR.
+Evento InventoryReserved.
 
 ---
 
-## Feature 12.2 - Queries
+### FEATURE 08.05
 
-Separar leitura e escrita.
-
----
-
-# EPIC 13 - Outbox Pattern
-
-## Feature 13.1 - Outbox
-
-Criar tabela Outbox.
+Evento InventoryReleased.
 
 ---
 
-## Feature 13.2 - Dispatcher
+### FEATURE 08.06
 
-Criar worker para publicação.
-
----
-
-# EPIC 14 - Saga Pattern
-
-## Feature 14.1 - Pedido
-
-Orquestrar:
-
-Pedido → Estoque → Pagamento
+Evento InventoryFailed.
 
 ---
 
-## Feature 14.2 - Compensação
+# EPIC 09 - Payment Service
 
-Pagamento falhou:
+Prioridade:
 
-* Liberar estoque
-* Cancelar pedido
-
----
-
-# EPIC 15 - API Gateway
-
-## Feature 15.1 - YARP
-
-Configurar roteamento.
+P0
 
 ---
 
-## Feature 15.2 - JWT
+### FEATURE 09.01
 
-Validar token.
-
----
-
-## Feature 15.3 - Rate Limiting
-
-Implementar limite de requisições.
+Processamento de pagamento.
 
 ---
 
-# EPIC 16 - Observabilidade
+### FEATURE 09.02
 
-## Feature 16.1 - OpenTelemetry
-
-Instrumentar todos os serviços.
+Aprovação de pagamento.
 
 ---
 
-## Feature 16.2 - Prometheus
+### FEATURE 09.03
 
-Exportar métricas.
-
----
-
-## Feature 16.3 - Grafana
-
-Criar dashboards.
+Rejeição de pagamento.
 
 ---
 
-# EPIC 17 - Testes
+### FEATURE 09.04
 
-## Feature 17.1 - Unitários
-
-Cobertura mínima:
-
-80%
+Evento PaymentApproved.
 
 ---
 
-## Feature 17.2 - Integração
+### FEATURE 09.05
 
-Testar:
-
-* RabbitMQ
-* PostgreSQL
-* MongoDB
-* Redis
+Evento PaymentRejected.
 
 ---
 
-# EPIC 18 - Docker
+# EPIC 10 - Saga Pattern
 
-## Feature 18.1
+Prioridade:
 
-Dockerfile para todos os serviços.
-
----
-
-## Feature 18.2
-
-Docker Compose completo.
+P0
 
 ---
 
-# EPIC 19 - Kubernetes
+### FEATURE 10.01
 
-## Feature 19.1
-
-Deployments
-
-## Feature 19.2
-
-Services
-
-## Feature 19.3
-
-ConfigMaps
-
-## Feature 19.4
-
-Secrets
-
-## Feature 19.5
-
-Ingress
+Saga de Checkout.
 
 ---
 
-# EPIC 20 - Documentação
+### FEATURE 10.02
 
-## Feature 20.1
+Fluxo principal.
 
-Swagger
+```text
+OrderCreated
+InventoryReserved
+PaymentApproved
+OrderConfirmed
+```
 
-## Feature 20.2
+---
 
-Architecture Diagrams
+### FEATURE 10.03
 
-## Feature 20.3
+Fluxo de compensação.
 
-Runbook
+```text
+PaymentRejected
+InventoryReleased
+OrderCancelled
+```
 
-## Feature 20.4
+---
 
-README Principal
+# EPIC 11 - Notification Service
 
-## Feature 20.5
+Prioridade:
 
-Guia de Deploy
+P1
+
+---
+
+### FEATURE 11.01
+
+Consumir OrderConfirmed.
+
+---
+
+### FEATURE 11.02
+
+Consumir OrderCancelled.
+
+---
+
+### FEATURE 11.03
+
+Enviar e-mail.
+
+---
+
+# EPIC 12 - Audit Service
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 12.01
+
+Consumir todos os eventos.
+
+---
+
+### FEATURE 12.02
+
+Persistir auditoria.
+
+---
+
+### FEATURE 12.03
+
+Consulta de auditoria.
+
+---
+
+# EPIC 13 - API Gateway
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 13.01
+
+Configurar YARP.
+
+---
+
+### FEATURE 13.02
+
+Roteamento.
+
+---
+
+### FEATURE 13.03
+
+JWT Validation.
+
+---
+
+### FEATURE 13.04
+
+Rate Limiting.
+
+---
+
+# EPIC 14 - Outbox Pattern
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 14.01
+
+Tabela Outbox.
+
+---
+
+### FEATURE 14.02
+
+Dispatcher.
+
+---
+
+### FEATURE 14.03
+
+Retry.
+
+---
+
+### FEATURE 14.04
+
+Reprocessamento.
+
+---
+
+# EPIC 15 - BFF
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 15.01
+
+Criar Web BFF.
+
+---
+
+### FEATURE 15.02
+
+Endpoint de catálogo.
+
+```http
+GET /catalog
+```
+
+---
+
+### FEATURE 15.03
+
+Endpoint de produto.
+
+```http
+GET /catalog/{id}
+```
+
+---
+
+### FEATURE 15.04
+
+Endpoint de carrinho.
+
+```http
+GET /cart
+POST /cart
+DELETE /cart
+```
+
+---
+
+### FEATURE 15.05
+
+Endpoint de checkout.
+
+```http
+POST /checkout
+```
+
+---
+
+### FEATURE 15.06
+
+Endpoint de pedidos.
+
+```http
+GET /orders
+GET /orders/{id}
+```
+
+---
+
+### FEATURE 15.07
+
+Cache.
+
+---
+
+# EPIC 16 - Frontend
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 16.01
+
+Tela Home.
+
+---
+
+### FEATURE 16.02
+
+Tela Login.
+
+---
+
+### FEATURE 16.03
+
+Tela Cadastro.
+
+---
+
+### FEATURE 16.04
+
+Tela Catálogo.
+
+---
+
+### FEATURE 16.05
+
+Tela Produto.
+
+---
+
+### FEATURE 16.06
+
+Tela Carrinho.
+
+---
+
+### FEATURE 16.07
+
+Tela Checkout.
+
+---
+
+### FEATURE 16.08
+
+Tela Pedidos.
+
+---
+
+### FEATURE 16.09
+
+Autenticação.
+
+---
+
+# EPIC 17 - Observabilidade
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 17.01
+
+OpenTelemetry.
+
+---
+
+### FEATURE 17.02
+
+Tracing distribuído.
+
+---
+
+### FEATURE 17.03
+
+Instrumentação RabbitMQ.
+
+---
+
+### FEATURE 17.04
+
+Instrumentação PostgreSQL.
+
+---
+
+### FEATURE 17.05
+
+Instrumentação MongoDB.
+
+---
+
+### FEATURE 17.06
+
+Instrumentação Redis.
+
+---
+
+# EPIC 18 - Prometheus
+
+Prioridade:
+
+P2
+
+---
+
+### FEATURE 18.01
+
+Coleta de métricas.
+
+---
+
+### FEATURE 18.02
+
+Métricas HTTP.
+
+---
+
+### FEATURE 18.03
+
+Métricas RabbitMQ.
+
+---
+
+### FEATURE 18.04
+
+Métricas Banco de Dados.
+
+---
+
+# EPIC 19 - Grafana
+
+Prioridade:
+
+P2
+
+---
+
+### FEATURE 19.01
+
+Dashboard APIs.
+
+---
+
+### FEATURE 19.02
+
+Dashboard RabbitMQ.
+
+---
+
+### FEATURE 19.03
+
+Dashboard Banco de Dados.
+
+---
+
+### FEATURE 19.04
+
+Dashboard Saga.
+
+---
+
+# EPIC 20 - Testes Automatizados
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 20.01
+
+Unit Tests.
+
+---
+
+### FEATURE 20.02
+
+Integration Tests.
+
+---
+
+### FEATURE 20.03
+
+End-to-End Tests.
+
+---
+
+### FEATURE 20.04
+
+Cobertura mínima 80%.
+
+---
+
+# EPIC 21 - Kubernetes
+
+Prioridade:
+
+P2
+
+---
+
+### FEATURE 21.01
+
+Deployments.
+
+---
+
+### FEATURE 21.02
+
+Services.
+
+---
+
+### FEATURE 21.03
+
+ConfigMaps.
+
+---
+
+### FEATURE 21.04
+
+Secrets.
+
+---
+
+### FEATURE 21.05
+
+Ingress.
+
+---
+
+# EPIC 22 - CI/CD
+
+Prioridade:
+
+P2
+
+---
+
+### FEATURE 22.01
+
+GitHub Actions Build.
+
+---
+
+### FEATURE 22.02
+
+GitHub Actions Tests.
+
+---
+
+### FEATURE 22.03
+
+Docker Build.
+
+---
+
+### FEATURE 22.04
+
+Docker Publish.
+
+---
+
+### FEATURE 22.05
+
+Deploy Pipeline.
+
+---
+
+# EPIC 23 - Frontend Observability
+
+Prioridade:
+
+P3
+
+---
+
+### FEATURE 23.01
+
+Frontend Logging.
+
+---
+
+### FEATURE 23.02
+
+Frontend Metrics.
+
+---
+
+### FEATURE 23.03
+
+Frontend Tracing.
+
+---
+
+# EPIC 24 - Portfólio
+
+Prioridade:
+
+P1
+
+---
+
+### FEATURE 24.01
+
+Atualizar README.
+
+---
+
+### FEATURE 24.02
+
+Criar diagramas finais.
+
+---
+
+### FEATURE 24.03
+
+Screenshots.
+
+---
+
+### FEATURE 24.04
+
+GIFs de demonstração.
+
+---
+
+### FEATURE 24.05
+
+Vídeo demonstrativo.
+
+---
+
+# MVP
+
+Para possuir um MVP funcional devem estar concluídos:
+
+* EPIC 01
+* EPIC 02
+* EPIC 03
+* EPIC 04
+* EPIC 05
+* EPIC 06
+* EPIC 07
+* EPIC 08
+* EPIC 09
+* EPIC 10
+* EPIC 13
+* EPIC 15
+* EPIC 16
+
+---
+
+# Meta Final
+
+Ao final do projeto será possível:
+
+* Criar conta
+* Realizar login
+* Consultar catálogo
+* Adicionar itens ao carrinho
+* Finalizar compra
+* Processar pagamento
+* Confirmar pedido
+* Visualizar histórico
+* Monitorar a plataforma
+* Demonstrar arquitetura distribuída moderna para entrevistas técnicas e portfólio profissional

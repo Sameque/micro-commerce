@@ -2,541 +2,773 @@
 
 # MicroCommerce - C4 Model
 
-Este documento descreve a arquitetura do sistema utilizando o modelo C4.
+## Objetivo
 
-Níveis:
+Este documento descreve a arquitetura da plataforma utilizando o modelo C4.
 
-* Level 1 - Context Diagram
-* Level 2 - Container Diagram
-* Level 3 - Component Diagram
-* Level 4 - Deployment Diagram
+Níveis documentados:
+
+* Level 1 — System Context
+* Level 2 — Container
+* Level 3 — Component
 
 ---
 
-# Level 1 - System Context Diagram
+# Level 1 — System Context
 
-Visão geral dos usuários e sistemas externos.
+## Visão Geral
 
-```mermaid
-flowchart LR
+MicroCommerce é uma plataforma de e-commerce distribuída baseada em Microservices.
 
-    Customer[Cliente]
+O sistema permite:
 
-    MicroCommerce[MicroCommerce Platform]
+* Cadastro de usuários
+* Login
+* Consulta de produtos
+* Carrinho de compras
+* Checkout
+* Processamento de pedidos
+* Pagamentos
+* Notificações
 
-    PaymentGateway[Fake Payment Gateway]
+---
 
-    EmailProvider[Email Provider]
+## Context Diagram
 
-    Customer --> MicroCommerce
-
-    MicroCommerce --> PaymentGateway
-
-    MicroCommerce --> EmailProvider
+```text
++------------------------------------------------+
+|                 Cliente                         |
++------------------------------------------------+
+                    |
+                    v
++------------------------------------------------+
+|               MicroCommerce                     |
+|            E-commerce Platform                  |
++------------------------------------------------+
+                    |
+     ---------------------------------
+     |               |               |
+     v               v               v
+ Payment Gateway   Email Provider   Monitoring Stack
 ```
 
 ---
 
-## Descrição
-
-### Cliente
-
-Usuário final que realiza compras.
-
-### MicroCommerce
-
-Plataforma de e-commerce baseada em microservices.
+## Sistemas Externos
 
 ### Payment Gateway
 
-Sistema externo utilizado para simular pagamentos.
+Responsável por:
 
-### Email Provider
+* Processamento de pagamentos
 
-Sistema externo responsável pelo envio de notificações.
+Exemplos futuros:
+
+* Stripe
+* Mercado Pago
+* Pagar.me
 
 ---
 
-# Level 2 - Container Diagram
+### Email Provider
 
-Visão dos containers principais.
+Responsável por:
 
-```mermaid
-flowchart TB
+* Envio de notificações
 
-    Client[Client]
+Exemplos futuros:
 
-    Gateway[API Gateway]
+* SendGrid
+* Amazon SES
 
-    Auth[Auth Service]
+---
 
-    CustomerSvc[Customer Service]
+### Monitoring Stack
 
-    CatalogSvc[Catalog Service]
+Responsável por:
 
-    CartSvc[Cart Service]
+* Observabilidade
+* Dashboards
+* Métricas
 
-    OrderSvc[Order Service]
+Componentes:
 
-    InventorySvc[Inventory Service]
+* Grafana
+* Prometheus
 
-    PaymentSvc[Payment Service]
+---
 
-    NotificationSvc[Notification Service]
+# Level 2 — Container Diagram
 
-    AuditSvc[Audit Service]
+## Visão Geral
 
-    RabbitMQ[RabbitMQ]
+O sistema é composto por múltiplos containers independentes.
 
-    Redis[(Redis)]
+---
 
-    PgOrder[(PostgreSQL)]
+## Container Diagram
 
-    Mongo[(MongoDB)]
-
-    Client --> Gateway
-
-    Gateway --> Auth
-
-    Gateway --> CustomerSvc
-
-    Gateway --> CatalogSvc
-
-    Gateway --> CartSvc
-
-    Gateway --> OrderSvc
-
-    Gateway --> InventorySvc
-
-    Gateway --> PaymentSvc
-
-    Gateway --> NotificationSvc
-
-    CartSvc --> Redis
-
-    OrderSvc --> PgOrder
-
-    InventorySvc --> PgOrder
-
-    CustomerSvc --> PgOrder
-
-    CatalogSvc --> PgOrder
-
-    Auth --> PgOrder
-
-    PaymentSvc --> Mongo
-
-    AuditSvc --> Mongo
-
-    OrderSvc --> RabbitMQ
-
-    RabbitMQ --> InventorySvc
-
-    RabbitMQ --> PaymentSvc
-
-    RabbitMQ --> NotificationSvc
-
-    RabbitMQ --> AuditSvc
+```text
+┌─────────────────────┐
+│      Cliente        │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   Frontend Web      │
+│      Next.js        │
+└──────────┬──────────┘
+           │ HTTP
+           ▼
+┌─────────────────────┐
+│      Web BFF        │
+│      .NET 8         │
+└──────────┬──────────┘
+           │ HTTP
+           ▼
+┌─────────────────────┐
+│    API Gateway      │
+│       YARP          │
+└──────────┬──────────┘
+           │
+           ▼
+─────────────────────────────────────────────
+│ Auth Service                              │
+│ Customer Service                          │
+│ Catalog Service                           │
+│ Cart Service                              │
+│ Order Service                             │
+│ Inventory Service                         │
+│ Payment Service                           │
+│ Notification Service                      │
+│ Audit Service                             │
+─────────────────────────────────────────────
+           │
+           ▼
+┌─────────────────────┐
+│     RabbitMQ        │
+└─────────────────────┘
 ```
 
 ---
 
-## Containers
+## Frontend Web
 
-### API Gateway
+Tecnologia:
 
-Responsável por:
+* Next.js
+* React
+* TypeScript
 
+Responsabilidades:
+
+* Interface do usuário
+* Navegação
 * Autenticação
-* Rate Limiting
-* Roteamento
+* Checkout
 
 ---
 
-### Auth Service
+## Web BFF
 
-Responsável por:
+Tecnologia:
 
+* .NET 8
+
+Responsabilidades:
+
+* Agregação de chamadas
+* View Models
+* Cache
+* Orquestração para frontend
+
+---
+
+## API Gateway
+
+Tecnologia:
+
+* YARP
+
+Responsabilidades:
+
+* Roteamento
+* JWT Validation
+* Rate Limiting
+
+---
+
+## Auth Service
+
+Responsabilidades:
+
+* Cadastro
 * Login
 * JWT
 * Refresh Token
 
+Banco:
+
+PostgreSQL
+
 ---
 
-### Customer Service
+## Customer Service
 
-Responsável por:
+Responsabilidades:
 
 * Clientes
 * Endereços
 
+Banco:
+
+PostgreSQL
+
 ---
 
-### Catalog Service
+## Catalog Service
 
-Responsável por:
+Responsabilidades:
 
 * Produtos
 * Categorias
 
+Banco:
+
+PostgreSQL
+
 ---
 
-### Cart Service
+## Cart Service
 
-Responsável por:
+Responsabilidades:
 
 * Carrinho
 
+Banco:
+
+Redis
+
 ---
 
-### Order Service
+## Order Service
 
-Responsável por:
+Responsabilidades:
 
 * Pedidos
+* Saga
+
+Banco:
+
+PostgreSQL
 
 ---
 
-### Inventory Service
+## Inventory Service
 
-Responsável por:
+Responsabilidades:
 
 * Estoque
+* Reservas
+
+Banco:
+
+PostgreSQL
 
 ---
 
-### Payment Service
+## Payment Service
 
-Responsável por:
+Responsabilidades:
 
 * Pagamentos
 
+Banco:
+
+MongoDB
+
 ---
 
-### Notification Service
+## Notification Service
 
-Responsável por:
+Responsabilidades:
 
 * Notificações
 
 ---
 
-### Audit Service
+## Audit Service
 
-Responsável por:
+Responsabilidades:
 
 * Auditoria
 
+Banco:
+
+MongoDB
+
 ---
 
-# Level 3 - Component Diagram
+# Banco de Dados por Serviço
 
-Order Service.
+```text
+Auth Service ---------- PostgreSQL
 
-```mermaid
-flowchart TB
+Customer Service ------ PostgreSQL
 
-    Api[API Layer]
+Catalog Service ------- PostgreSQL
 
-    Commands[Commands]
+Order Service --------- PostgreSQL
 
-    Queries[Queries]
+Inventory Service ----- PostgreSQL
 
-    Handlers[Handlers]
+Cart Service ---------- Redis
 
-    Domain[Domain]
+Payment Service ------- MongoDB
 
-    Repository[Repository]
-
-    Outbox[Outbox]
-
-    Db[(PostgreSQL)]
-
-    Api --> Commands
-
-    Api --> Queries
-
-    Commands --> Handlers
-
-    Queries --> Handlers
-
-    Handlers --> Domain
-
-    Handlers --> Repository
-
-    Repository --> Db
-
-    Domain --> Outbox
-
-    Outbox --> Db
+Audit Service --------- MongoDB
 ```
 
 ---
 
-## Componentes
+# Comunicação Entre Containers
 
-### API Layer
+## Síncrona
 
-Endpoints HTTP.
+Tecnologia:
+
+HTTP REST
+
+Fluxo:
+
+```text
+Frontend
+    |
+BFF
+    |
+Gateway
+    |
+Microservice
+```
 
 ---
 
-### Commands
+## Assíncrona
 
-Operações de escrita.
+Tecnologia:
+
+RabbitMQ
+
+Fluxo:
+
+```text
+Microservice
+      |
+RabbitMQ
+      |
+Microservice
+```
 
 ---
 
-### Queries
+# Level 3 — Component Diagram
 
-Operações de leitura.
+## Auth Service
+
+### Componentes
+
+```text
+API
+ |
+Application
+ |
+Domain
+ |
+Infrastructure
+```
 
 ---
 
-### Handlers
+### API
 
-Executam regras de negócio.
+Responsável por:
+
+* Endpoints
+* Middleware
+* Swagger
+
+---
+
+### Application
+
+Responsável por:
+
+* Commands
+* Queries
+* Validators
+* Handlers
 
 ---
 
 ### Domain
 
-Entidades e regras.
+Responsável por:
+
+* Entidades
+* Regras de negócio
+* Eventos de domínio
 
 ---
 
-### Repository
+### Infrastructure
+
+Responsável por:
+
+* PostgreSQL
+* JWT
+* Repositórios
+
+---
+
+# Catalog Service
+
+## Componentes
+
+```text
+API
+ |
+Application
+ |
+Domain
+ |
+Infrastructure
+```
+
+---
+
+### Principais Componentes
+
+#### Product Aggregate
+
+Responsável por:
+
+* Nome
+* Descrição
+* Preço
+* Categoria
+
+---
+
+#### Product Repository
+
+Responsável por:
 
 Persistência.
 
 ---
 
-### Outbox
+#### Product Queries
+
+Responsável por:
+
+Leitura de produtos.
+
+---
+
+#### Product Commands
+
+Responsável por:
+
+Escrita de produtos.
+
+---
+
+# Order Service
+
+## Componentes
+
+```text
+API
+ |
+Application
+ |
+Domain
+ |
+Infrastructure
+```
+
+---
+
+### Aggregate Principal
+
+Order
+
+---
+
+### Commands
+
+```text
+CreateOrderCommand
+
+ConfirmOrderCommand
+
+CancelOrderCommand
+```
+
+---
+
+### Queries
+
+```text
+GetOrderQuery
+
+GetOrdersQuery
+```
+
+---
+
+### Eventos
+
+```text
+OrderCreated
+
+OrderConfirmed
+
+OrderCancelled
+```
+
+---
+
+### Saga Coordinator
+
+Responsável por:
+
+* Iniciar Saga
+* Controlar estado
+* Publicar eventos
+
+---
+
+# Inventory Service
+
+## Componentes
+
+### Inventory Aggregate
+
+Responsável por:
+
+* Quantidade disponível
+* Reserva
+
+---
+
+### Commands
+
+```text
+ReserveInventoryCommand
+
+ReleaseInventoryCommand
+```
+
+---
+
+### Eventos
+
+```text
+InventoryReserved
+
+InventoryReleased
+
+InventoryFailed
+```
+
+---
+
+# Payment Service
+
+## Componentes
+
+### Payment Aggregate
+
+Responsável por:
+
+* Transação
+* Status
+
+---
+
+### Commands
+
+```text
+ProcessPaymentCommand
+```
+
+---
+
+### Eventos
+
+```text
+PaymentApproved
+
+PaymentRejected
+```
+
+---
+
+# Notification Service
+
+## Componentes
+
+### Email Sender
+
+Responsável por:
+
+* Enviar e-mails
+
+---
+
+### Event Consumers
+
+Consumidores de:
+
+```text
+OrderConfirmed
+
+OrderCancelled
+```
+
+---
+
+# Audit Service
+
+## Componentes
+
+### Event Consumer
+
+Consome todos os eventos.
+
+---
+
+### Audit Repository
+
+Responsável por:
 
 Persistência dos eventos.
 
 ---
 
-# Component Diagram - Payment Service
-
-```mermaid
-flowchart TB
-
-    Consumer[Event Consumer]
-
-    PaymentHandler[Payment Handler]
-
-    Gateway[Payment Gateway Adapter]
-
-    Mongo[(MongoDB)]
-
-    Publisher[Event Publisher]
-
-    Consumer --> PaymentHandler
-
-    PaymentHandler --> Gateway
-
-    PaymentHandler --> Mongo
-
-    PaymentHandler --> Publisher
-```
-
----
-
-# Component Diagram - Inventory Service
-
-```mermaid
-flowchart TB
-
-    Consumer[OrderCreated Consumer]
-
-    InventoryHandler[Inventory Handler]
-
-    InventoryRepository[Inventory Repository]
-
-    Db[(PostgreSQL)]
-
-    Publisher[Event Publisher]
-
-    Consumer --> InventoryHandler
-
-    InventoryHandler --> InventoryRepository
-
-    InventoryRepository --> Db
-
-    InventoryHandler --> Publisher
-```
-
----
-
-# Level 4 - Deployment Diagram
-
-Ambiente Kubernetes.
-
-```mermaid
-flowchart TB
-
-    User[Client]
-
-    Ingress[Ingress]
-
-    GatewayPod[Gateway Pod]
-
-    AuthPod[Auth Pod]
-
-    CustomerPod[Customer Pod]
-
-    CatalogPod[Catalog Pod]
-
-    CartPod[Cart Pod]
-
-    OrderPod[Order Pod]
-
-    InventoryPod[Inventory Pod]
-
-    PaymentPod[Payment Pod]
-
-    NotificationPod[Notification Pod]
-
-    AuditPod[Audit Pod]
-
-    Rabbit[(RabbitMQ)]
-
-    Redis[(Redis)]
-
-    Postgres[(PostgreSQL)]
-
-    Mongo[(MongoDB)]
-
-    Grafana[(Grafana)]
-
-    Prometheus[(Prometheus)]
-
-    User --> Ingress
-
-    Ingress --> GatewayPod
-
-    GatewayPod --> AuthPod
-
-    GatewayPod --> CustomerPod
-
-    GatewayPod --> CatalogPod
-
-    GatewayPod --> CartPod
-
-    GatewayPod --> OrderPod
-
-    GatewayPod --> InventoryPod
-
-    GatewayPod --> PaymentPod
-
-    GatewayPod --> NotificationPod
-
-    GatewayPod --> AuditPod
-
-    OrderPod --> Rabbit
-
-    InventoryPod --> Rabbit
-
-    PaymentPod --> Rabbit
-
-    NotificationPod --> Rabbit
-
-    AuditPod --> Rabbit
-
-    CartPod --> Redis
-
-    AuthPod --> Postgres
-
-    CustomerPod --> Postgres
-
-    CatalogPod --> Postgres
-
-    OrderPod --> Postgres
-
-    InventoryPod --> Postgres
-
-    PaymentPod --> Mongo
-
-    AuditPod --> Mongo
-
-    Prometheus --> GatewayPod
-    Prometheus --> AuthPod
-    Prometheus --> CustomerPod
-    Prometheus --> CatalogPod
-    Prometheus --> OrderPod
-    Prometheus --> InventoryPod
-    Prometheus --> PaymentPod
-
-    Grafana --> Prometheus
-```
-
----
-
-# Fluxo de Negócio Principal
-
-```mermaid
-sequenceDiagram
-
-    participant Client
-
-    participant Order
-
-    participant RabbitMQ
-
-    participant Inventory
-
-    participant Payment
-
-    participant Notification
-
-    Client->>Order: Create Order
-
-    Order->>RabbitMQ: OrderCreated
-
-    RabbitMQ->>Inventory: Reserve Stock
-
-    Inventory->>RabbitMQ: InventoryReserved
-
-    RabbitMQ->>Payment: Process Payment
-
-    Payment->>RabbitMQ: PaymentApproved
-
-    RabbitMQ->>Order: PaymentApproved
-
-    Order->>RabbitMQ: OrderConfirmed
-
-    RabbitMQ->>Notification: Send Email
+# Fluxo de Checkout
+
+## Caminho Feliz
+
+```text
+Frontend
+    |
+BFF
+    |
+Order Service
+    |
+OrderCreated
+    |
+RabbitMQ
+    |
+Inventory Service
+    |
+InventoryReserved
+    |
+RabbitMQ
+    |
+Payment Service
+    |
+PaymentApproved
+    |
+RabbitMQ
+    |
+Order Service
+    |
+OrderConfirmed
 ```
 
 ---
 
 # Fluxo de Compensação
 
-```mermaid
-sequenceDiagram
-
-    participant Order
-
-    participant RabbitMQ
-
-    participant Inventory
-
-    participant Payment
-
-    Order->>RabbitMQ: OrderCreated
-
-    RabbitMQ->>Inventory: Reserve Stock
-
-    Inventory->>RabbitMQ: InventoryReserved
-
-    RabbitMQ->>Payment: Process Payment
-
-    Payment->>RabbitMQ: PaymentRejected
-
-    RabbitMQ->>Inventory: Release Stock
-
-    Inventory->>RabbitMQ: InventoryReleased
-
-    RabbitMQ->>Order: Cancel Order
+```text
+OrderCreated
+      |
+InventoryReserved
+      |
+PaymentRejected
+      |
+InventoryReleased
+      |
+OrderCancelled
 ```
+
+---
+
+# Observabilidade
+
+Todos os containers devem possuir:
+
+```text
+Logs
+
+Traces
+
+Metrics
+
+Health Checks
+```
+
+---
+
+## Logs
+
+Ferramenta:
+
+Serilog
+
+---
+
+## Traces
+
+Ferramenta:
+
+OpenTelemetry
+
+---
+
+## Métricas
+
+Ferramenta:
+
+Prometheus
+
+---
+
+## Dashboards
+
+Ferramenta:
+
+Grafana
+
+---
+
+# Resumo
+
+A arquitetura do MicroCommerce foi projetada para demonstrar:
+
+* Microservices
+* DDD
+* Clean Architecture
+* CQRS
+* Event Driven Architecture
+* Saga Pattern
+* Outbox Pattern
+* BFF Pattern
+* API Gateway
+* Observabilidade Distribuída
+* Infraestrutura Cloud Native
+
+utilizando tecnologias amplamente adotadas em ambientes corporativos modernos.

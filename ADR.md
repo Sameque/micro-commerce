@@ -1,6 +1,16 @@
+# ADR.md
+
 # Architecture Decision Records
 
-Este documento registra as principais decisões arquiteturais do projeto MicroCommerce.
+## Objetivo
+
+Este documento registra as principais decisões arquiteturais adotadas no projeto MicroCommerce.
+
+Todos os ADRs devem seguir o formato:
+
+* Contexto
+* Decisão
+* Consequências
 
 ---
 
@@ -12,19 +22,18 @@ Accepted
 
 ## Contexto
 
-O objetivo do projeto é demonstrar competências em arquitetura distribuída moderna e servir como portfólio profissional.
+A plataforma possui múltiplos domínios independentes:
 
-O sistema possui múltiplos domínios de negócio:
-
+* Autenticação
 * Clientes
-* Produtos
+* Catálogo
 * Carrinho
 * Pedidos
 * Estoque
 * Pagamentos
 * Notificações
 
-Em uma arquitetura monolítica, esses domínios tenderiam a crescer de forma acoplada ao longo do tempo.
+Uma arquitetura monolítica aumentaria o acoplamento entre esses domínios.
 
 ## Decisão
 
@@ -34,20 +43,18 @@ Utilizar arquitetura baseada em Microservices.
 
 ### Positivas
 
-* Independência entre domínios
-* Escalabilidade individual
 * Deploy independente
-* Demonstração de conhecimentos em sistemas distribuídos
+* Escalabilidade por domínio
+* Isolamento de responsabilidades
 
 ### Negativas
 
-* Maior complexidade operacional
+* Complexidade operacional
 * Comunicação distribuída
-* Necessidade de observabilidade
 
 ---
 
-# ADR-002 - Banco de Dados por Serviço
+# ADR-002 - Database Per Service
 
 ## Status
 
@@ -55,9 +62,7 @@ Accepted
 
 ## Contexto
 
-Compartilhamento de banco de dados entre microservices gera forte acoplamento.
-
-Mudanças em um domínio podem impactar outros serviços.
+Compartilhamento de banco gera forte acoplamento entre serviços.
 
 ## Decisão
 
@@ -67,14 +72,14 @@ Cada microservice possuirá seu próprio banco de dados.
 
 ### Positivas
 
-* Baixo acoplamento
-* Independência tecnológica
+* Independência
 * Escalabilidade
+* Evolução isolada
 
 ### Negativas
 
 * Consistência eventual
-* Duplicação de alguns dados
+* Duplicação controlada de dados
 
 ---
 
@@ -86,31 +91,25 @@ Accepted
 
 ## Contexto
 
-Os domínios principais possuem natureza relacional.
-
-Exemplos:
-
-* Clientes
-* Produtos
-* Pedidos
-* Estoque
+A maior parte dos domínios possui natureza relacional.
 
 ## Decisão
 
-Utilizar PostgreSQL como banco principal.
+Utilizar PostgreSQL para:
+
+* Auth Service
+* Customer Service
+* Catalog Service
+* Order Service
+* Inventory Service
 
 ## Consequências
 
 ### Positivas
 
 * Open Source
-* Excelente performance
-* Ampla adoção
-* Suporte a JSON
-
-### Negativas
-
-* Necessidade de administração adicional em produção
+* Confiável
+* Excelente suporte no ecossistema .NET
 
 ---
 
@@ -122,25 +121,21 @@ Accepted
 
 ## Contexto
 
-Auditoria e histórico de pagamentos possuem estrutura mais flexível.
+Pagamentos e auditoria possuem estruturas flexíveis e orientadas a documentos.
 
 ## Decisão
 
 Utilizar MongoDB para:
 
-* Audit Service
 * Payment Service
+* Audit Service
 
 ## Consequências
 
 ### Positivas
 
-* Flexibilidade de schema
-* Facilidade de armazenar eventos
-
-### Negativas
-
-* Ausência de relacionamentos nativos
+* Schema flexível
+* Boa aderência a eventos
 
 ---
 
@@ -152,12 +147,7 @@ Accepted
 
 ## Contexto
 
-Carrinho é altamente volátil.
-
-Necessita:
-
-* Baixa latência
-* Atualizações frequentes
+Carrinho exige baixa latência e alta frequência de atualização.
 
 ## Decisão
 
@@ -167,16 +157,16 @@ Utilizar Redis.
 
 ### Positivas
 
-* Performance extremamente alta
+* Alta performance
 * Simplicidade
 
 ### Negativas
 
-* Persistência opcional
+* Dados temporários
 
 ---
 
-# ADR-006 - RabbitMQ como Broker
+# ADR-006 - RabbitMQ como Message Broker
 
 ## Status
 
@@ -184,7 +174,7 @@ Accepted
 
 ## Contexto
 
-O projeto necessita de comunicação assíncrona entre serviços.
+O sistema necessita comunicação assíncrona entre domínios.
 
 Alternativas avaliadas:
 
@@ -198,21 +188,20 @@ Utilizar RabbitMQ.
 
 ## Motivos
 
-* Fácil configuração local
-* Excelente documentação
-* Curva de aprendizado menor
-* Amplamente utilizado com .NET
+* Simplicidade
+* Facilidade de configuração local
+* Excelente integração com .NET
 
 ## Consequências
 
 ### Positivas
 
-* Simplicidade
-* Boa integração com .NET
+* Curva de aprendizado menor
+* Bom suporte para filas e DLQ
 
 ### Negativas
 
-* Menor throughput que Kafka
+* Menor throughput comparado ao Kafka
 
 ---
 
@@ -224,23 +213,11 @@ Accepted
 
 ## Contexto
 
-Comunicação síncrona excessiva gera dependência entre serviços.
+Chamadas síncronas entre serviços aumentam o acoplamento.
 
 ## Decisão
 
-Eventos serão o principal mecanismo de integração.
-
-## Exemplo
-
-```text
-OrderCreated
-
-InventoryReserved
-
-PaymentApproved
-
-OrderConfirmed
-```
+Utilizar eventos como principal mecanismo de integração.
 
 ## Consequências
 
@@ -265,39 +242,15 @@ Accepted
 
 Pedidos envolvem múltiplos serviços.
 
-Exemplo:
+Não existe transação distribuída entre:
 
 * Pedido
 * Estoque
 * Pagamento
 
-Não existe transação distribuída.
-
 ## Decisão
 
 Utilizar Saga Pattern.
-
-## Fluxo
-
-```text
-OrderCreated
-      |
-InventoryReserved
-      |
-PaymentApproved
-      |
-OrderConfirmed
-```
-
-## Fluxo de Compensação
-
-```text
-PaymentRejected
-      |
-InventoryReleased
-      |
-OrderCancelled
-```
 
 ## Consequências
 
@@ -322,13 +275,8 @@ Accepted
 
 Existem duas abordagens:
 
-### Choreography
-
-Eventos coordenam todo o fluxo.
-
-### Orchestration
-
-Um serviço controla a saga.
+* Choreography
+* Orchestration
 
 ## Decisão
 
@@ -336,20 +284,9 @@ Utilizar Saga Orquestrada.
 
 ## Motivos
 
-* Mais fácil de entender
-* Melhor para portfólio
+* Fluxos mais previsíveis
+* Mais fácil para demonstração
 * Melhor rastreabilidade
-
-## Consequências
-
-### Positivas
-
-* Fluxos centralizados
-* Facilidade de debug
-
-### Negativas
-
-* Dependência do orquestrador
 
 ---
 
@@ -361,16 +298,7 @@ Accepted
 
 ## Contexto
 
-Publicar eventos após SaveChanges pode causar inconsistência.
-
-Exemplo:
-
-* Pedido salvo
-* RabbitMQ indisponível
-
-Resultado:
-
-Pedido existe, evento não.
+Falhas entre persistência e publicação de eventos podem gerar inconsistências.
 
 ## Decisão
 
@@ -385,7 +313,7 @@ Implementar Outbox Pattern.
 
 ### Negativas
 
-* Complexidade adicional
+* Mais componentes
 
 ---
 
@@ -397,7 +325,7 @@ Accepted
 
 ## Contexto
 
-Leitura e escrita possuem características diferentes.
+Leitura e escrita possuem responsabilidades diferentes.
 
 ## Decisão
 
@@ -407,12 +335,8 @@ Separar Commands e Queries.
 
 ### Positivas
 
-* Código organizado
+* Organização
 * Escalabilidade futura
-
-### Negativas
-
-* Mais classes
 
 ---
 
@@ -424,34 +348,18 @@ Accepted
 
 ## Contexto
 
-Necessidade de desacoplar regras de negócio da infraestrutura.
+Necessidade de desacoplamento entre domínio e infraestrutura.
 
 ## Decisão
 
-Todos os serviços utilizarão Clean Architecture.
+Todos os serviços seguirão Clean Architecture.
 
 ## Camadas
 
-```text
-API
-
-Application
-
-Domain
-
-Infrastructure
-```
-
-## Consequências
-
-### Positivas
-
-* Testabilidade
-* Manutenção
-
-### Negativas
-
-* Mais estrutura inicial
+* Api
+* Application
+* Domain
+* Infrastructure
 
 ---
 
@@ -463,7 +371,7 @@ Accepted
 
 ## Contexto
 
-Necessidade de implementar CQRS de forma consistente.
+Implementação de CQRS.
 
 ## Decisão
 
@@ -476,10 +384,6 @@ Utilizar MediatR.
 * Commands e Queries organizados
 * Baixo acoplamento
 
-### Negativas
-
-* Curva inicial para iniciantes
-
 ---
 
 # ADR-014 - YARP como API Gateway
@@ -490,14 +394,7 @@ Accepted
 
 ## Contexto
 
-Necessidade de um API Gateway integrado ao ecossistema .NET.
-
-Alternativas avaliadas:
-
-* Ocelot
-* Kong
-* Nginx
-* YARP
+Necessidade de Gateway integrado ao ecossistema .NET.
 
 ## Decisão
 
@@ -519,7 +416,7 @@ Accepted
 
 ## Contexto
 
-Microservices exigem rastreamento distribuído.
+Necessidade de rastreamento distribuído.
 
 ## Decisão
 
@@ -547,7 +444,7 @@ Necessidade de ambiente reproduzível.
 
 ## Decisão
 
-Todos os serviços serão containerizados.
+Todos os componentes serão containerizados.
 
 ---
 
@@ -559,22 +456,11 @@ Accepted
 
 ## Contexto
 
-Necessidade de demonstrar orquestração moderna.
+Demonstrar orquestração moderna.
 
 ## Decisão
 
 Utilizar Kubernetes.
-
-## Objetivo
-
-Demonstrar:
-
-* Deployments
-* Services
-* Ingress
-* ConfigMaps
-* Secrets
-* Escalabilidade horizontal
 
 ---
 
@@ -586,28 +472,19 @@ Accepted
 
 ## Contexto
 
-Garantir qualidade do projeto.
+Garantir qualidade do sistema.
 
 ## Decisão
 
 Implementar:
 
-### Unit Tests
+* Unit Tests
+* Integration Tests
+* End-to-End Tests
 
 Cobertura mínima:
 
-```text
 80%
-```
-
-### Integration Tests
-
-Cobrir:
-
-* PostgreSQL
-* MongoDB
-* Redis
-* RabbitMQ
 
 ---
 
@@ -619,7 +496,7 @@ Accepted
 
 ## Contexto
 
-Sistemas distribuídos exigem monitoramento.
+Sistemas distribuídos exigem monitoramento completo.
 
 ## Decisão
 
@@ -627,19 +504,18 @@ Todos os serviços devem expor:
 
 ```http
 GET /health
-
 GET /metrics
 ```
 
-Monitoramento via:
+Além de:
 
-* OpenTelemetry
-* Prometheus
-* Grafana
+* Logs
+* Traces
+* Métricas
 
 ---
 
-# ADR-020 - Objetivo do Projeto
+# ADR-020 - Frontend Separado
 
 ## Status
 
@@ -647,7 +523,184 @@ Accepted
 
 ## Contexto
 
-Projeto destinado ao GitHub e demonstração profissional.
+Permitir evolução independente da interface.
+
+## Decisão
+
+Frontend desacoplado dos microservices.
+
+Tecnologia:
+
+* Next.js
+* React
+* TypeScript
+
+## Consequências
+
+### Positivas
+
+* Escalabilidade
+* Independência de deploy
+
+---
+
+# ADR-021 - Backend For Frontend (BFF)
+
+## Status
+
+Accepted
+
+## Contexto
+
+Frontend precisaria conhecer múltiplos microservices.
+
+Isso aumentaria:
+
+* Complexidade
+* Acoplamento
+* Número de requisições
+
+## Decisão
+
+Criar um BFF exclusivo para o frontend.
+
+Fluxo:
+
+```text
+Frontend
+    |
+BFF
+    |
+Gateway
+    |
+Microservices
+```
+
+## Consequências
+
+### Positivas
+
+* Menos round trips
+* Melhor experiência do usuário
+* Menor acoplamento
+
+### Negativas
+
+* Componente adicional
+
+---
+
+# ADR-022 - Next.js
+
+## Status
+
+Accepted
+
+## Contexto
+
+Necessidade de framework moderno para frontend.
+
+Alternativas:
+
+* Angular
+* React SPA
+* Next.js
+
+## Decisão
+
+Utilizar Next.js.
+
+## Motivos
+
+* SSR
+* Server Components
+* Excelente DX
+* Popularidade de mercado
+
+---
+
+# ADR-023 - TanStack Query
+
+## Status
+
+Accepted
+
+## Contexto
+
+Necessidade de gerenciamento eficiente de dados remotos.
+
+## Decisão
+
+Utilizar TanStack Query.
+
+## Consequências
+
+### Positivas
+
+* Cache automático
+* Revalidação
+* Redução de chamadas
+
+---
+
+# ADR-024 - Zustand
+
+## Status
+
+Accepted
+
+## Contexto
+
+Necessidade de gerenciamento simples de estado local.
+
+Alternativas:
+
+* Redux
+* MobX
+* Zustand
+
+## Decisão
+
+Utilizar Zustand.
+
+## Motivos
+
+* Simplicidade
+* Pouco boilerplate
+* Fácil integração com React
+
+---
+
+# ADR-025 - API First
+
+## Status
+
+Accepted
+
+## Contexto
+
+Frontend e Backend evoluirão de forma independente.
+
+## Decisão
+
+Todos os contratos devem ser definidos antes da implementação.
+
+Ferramenta:
+
+* OpenAPI
+* Swagger
+
+---
+
+# ADR-026 - Objetivo do Projeto
+
+## Status
+
+Accepted
+
+## Contexto
+
+Projeto destinado a portfólio e entrevistas técnicas.
 
 ## Decisão
 
@@ -658,8 +711,14 @@ Priorizar:
 * Documentação
 * Demonstração de conceitos modernos
 
-Mesmo quando isso resultar em mais código ou mais componentes do que seriam necessários em um sistema simples.
+Mesmo que isso aumente a complexidade em relação a um e-commerce simples.
 
-## Consequência
+## Resultado Esperado
 
-O projeto servirá como referência de arquitetura moderna para entrevistas técnicas, apresentações e portfólio profissional.
+O projeto deverá demonstrar capacidade de atuação como:
+
+* Desenvolvedor Backend Senior
+* Desenvolvedor Full Stack Senior
+* Software Engineer
+* Tech Lead
+* Software Architect

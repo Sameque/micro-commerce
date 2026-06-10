@@ -1,60 +1,368 @@
-# Fluxo Principal do Sistema
+# SYSTEM_DESIGN.md
 
-## Cadastro de Cliente
+# MicroCommerce - System Design
+
+## Objetivo
+
+Este documento descreve o funcionamento interno da plataforma MicroCommerce.
+
+O foco deste documento é apresentar:
+
+* Fluxos de negócio
+* Comunicação entre componentes
+* Eventos
+* Integrações
+* Processos distribuídos
+* Estratégias de consistência
+
+---
+
+# Visão Geral
+
+A plataforma é composta por:
+
+* Frontend Web
+* BFF
+* API Gateway
+* Microservices
+* RabbitMQ
+* Bancos de Dados
+* Ferramentas de Observabilidade
+
+---
+
+# Fluxo Geral da Aplicação
 
 ```text
-Cliente
+Usuário
    |
-   v
-Customer Service
+Frontend (Next.js)
    |
-   v
+BFF
+   |
+API Gateway
+   |
+Microservices
+   |
+RabbitMQ
+```
+
+---
+
+# Fluxo de Autenticação
+
+## Login
+
+### Passo 1
+
+Usuário informa:
+
+* E-mail
+* Senha
+
+---
+
+### Passo 2
+
+Frontend envia requisição para:
+
+```http
+POST /login
+```
+
+---
+
+### Passo 3
+
+BFF encaminha para:
+
+```http
+POST /auth/login
+```
+
+---
+
+### Passo 4
+
+Auth Service:
+
+* Valida usuário
+* Valida senha
+* Gera JWT
+* Gera Refresh Token
+
+---
+
+### Passo 5
+
+Resposta:
+
+```json
+{
+  "accessToken": "jwt",
+  "refreshToken": "token"
+}
+```
+
+---
+
+## Diagrama
+
+```text
+Frontend
+    |
+    v
+BFF
+    |
+    v
+Gateway
+    |
+    v
+Auth Service
+```
+
+---
+
+# Fluxo de Cadastro
+
+## Objetivo
+
+Criar nova conta.
+
+---
+
+### Fluxo
+
+```text
+Frontend
+    |
+BFF
+    |
+Gateway
+    |
+Auth Service
+```
+
+---
+
+### Endpoint
+
+```http
+POST /register
+```
+
+---
+
+### Resultado
+
+Usuário criado.
+
+Evento publicado:
+
+```text
 CustomerCreated
 ```
 
 ---
 
+# Fluxo de Catálogo
+
 ## Consulta de Produtos
 
+### Fluxo
+
 ```text
-Cliente
-   |
+Frontend
+    |
+BFF
+    |
 Gateway
-   |
+    |
 Catalog Service
-   |
-PostgreSQL
 ```
 
 ---
 
-## Adicionar ao Carrinho
+### Endpoint BFF
+
+```http
+GET /catalog
+```
+
+---
+
+### Endpoint Interno
+
+```http
+GET /products
+```
+
+---
+
+### Resposta
+
+```json
+{
+  "items": []
+}
+```
+
+---
+
+# Fluxo de Detalhes do Produto
+
+### Endpoint
+
+```http
+GET /catalog/{id}
+```
+
+---
+
+### Processo
 
 ```text
-Cliente
-   |
+Frontend
+    |
+BFF
+    |
+Catalog Service
+```
+
+---
+
+### Retorno
+
+* Produto
+* Categoria
+* Estoque disponível
+
+---
+
+# Fluxo do Carrinho
+
+## Adicionar Item
+
+### Endpoint
+
+```http
+POST /cart
+```
+
+---
+
+### Processo
+
+```text
+Frontend
+    |
+BFF
+    |
+Gateway
+    |
 Cart Service
-   |
+    |
 Redis
 ```
 
 ---
 
-## Criar Pedido
+### Persistência
 
-```text
-Cliente
-   |
-Order Service
-   |
-PostgreSQL
-   |
-OrderCreated Event
+Redis.
+
+---
+
+## Remover Item
+
+```http
+DELETE /cart/items/{id}
 ```
 
 ---
 
-## Reserva de Estoque
+## Atualizar Quantidade
+
+```http
+PUT /cart/items/{id}
+```
+
+---
+
+# Fluxo de Checkout
+
+## Objetivo
+
+Transformar carrinho em pedido.
+
+---
+
+## Sequência
+
+### 1
+
+Cliente clica:
+
+```text
+Finalizar Compra
+```
+
+---
+
+### 2
+
+Frontend chama:
+
+```http
+POST /checkout
+```
+
+---
+
+### 3
+
+BFF recupera:
+
+* Usuário
+* Carrinho
+
+---
+
+### 4
+
+BFF envia:
+
+```http
+POST /orders
+```
+
+---
+
+### 5
+
+Order Service cria pedido.
+
+Estado inicial:
+
+```text
+Pending
+```
+
+---
+
+### 6
+
+Evento publicado:
+
+```text
+OrderCreated
+```
+
+---
+
+# Fluxo Saga
+
+Após OrderCreated.
 
 ```text
 OrderCreated
@@ -62,33 +370,128 @@ OrderCreated
 RabbitMQ
       |
 Inventory Service
+```
+
+---
+
+# Reserva de Estoque
+
+## Inventory Service
+
+Recebe:
+
+```text
+OrderCreated
+```
+
+---
+
+Valida:
+
+* Produto existe
+* Quantidade disponível
+
+---
+
+### Sucesso
+
+Publica:
+
+```text
+InventoryReserved
+```
+
+---
+
+### Falha
+
+Publica:
+
+```text
+InventoryFailed
+```
+
+---
+
+# Processamento de Pagamento
+
+## Payment Service
+
+Recebe:
+
+```text
+InventoryReserved
+```
+
+---
+
+Executa:
+
+```text
+ProcessPayment
+```
+
+---
+
+### Sucesso
+
+Publica:
+
+```text
+PaymentApproved
+```
+
+---
+
+### Falha
+
+Publica:
+
+```text
+PaymentRejected
+```
+
+---
+
+# Confirmação do Pedido
+
+## Order Service
+
+Recebe:
+
+```text
+PaymentApproved
+```
+
+---
+
+Atualiza:
+
+```text
+Pending
+   |
+Confirmed
+```
+
+---
+
+Publica:
+
+```text
+OrderConfirmed
+```
+
+---
+
+# Fluxo Completo da Saga
+
+```text
+OrderCreated
       |
 InventoryReserved
-```
-
----
-
-## Processamento de Pagamento
-
-```text
-InventoryReserved
-        |
-RabbitMQ
-        |
-Payment Service
-        |
+      |
 PaymentApproved
-```
-
----
-
-## Confirmação de Pedido
-
-```text
-PaymentApproved
-       |
-Order Service
-       |
+      |
 OrderConfirmed
 ```
 
@@ -96,86 +499,274 @@ OrderConfirmed
 
 # Fluxo de Compensação
 
-## Falha no Pagamento
+Quando o pagamento falhar.
+
+---
+
+## Evento
 
 ```text
 PaymentRejected
-        |
-RabbitMQ
-        |
-Inventory Service
-        |
-InventoryReleased
-        |
-Order Service
-        |
-OrderCancelled
 ```
 
 ---
 
-# Estados do Pedido
+### Inventory Service
+
+Recebe:
 
 ```text
-Pending
-Reserved
-Paid
-Confirmed
+PaymentRejected
+```
+
+---
+
+Libera estoque.
+
+Publica:
+
+```text
+InventoryReleased
+```
+
+---
+
+### Order Service
+
+Recebe:
+
+```text
+InventoryReleased
+```
+
+Atualiza:
+
+```text
 Cancelled
 ```
 
 ---
 
-# Estados do Estoque
+Publica:
 
 ```text
-Available
-Reserved
-Released
+OrderCancelled
 ```
 
 ---
 
-# Estados do Pagamento
+# Fluxo de Notificações
+
+## Notification Service
+
+Consumidor dos eventos:
 
 ```text
-Pending
-Approved
-Rejected
-Refunded
+OrderConfirmed
+
+OrderCancelled
 ```
 
 ---
 
-# Escalabilidade
+### Exemplo
 
-Serviços que devem ser escalados horizontalmente:
+```text
+OrderConfirmed
+      |
+Notification Service
+      |
+Send Email
+```
 
-* Catalog
-* Order
-* Payment
-* Notification
+---
+
+# Fluxo de Auditoria
+
+## Audit Service
+
+Escuta:
+
+```text
+Todos os eventos
+```
+
+---
+
+Persistência:
+
+MongoDB
+
+---
+
+### Estrutura
+
+```json
+{
+  "eventId": "",
+  "eventType": "",
+  "occurredAt": "",
+  "payload": {}
+}
+```
+
+---
+
+# Comunicação Síncrona
+
+Utilizada para:
+
+* Login
+* Cadastro
+* Consulta de produtos
+* Consulta de pedidos
+* Carrinho
+
+Tecnologia:
+
+HTTP REST
+
+---
+
+# Comunicação Assíncrona
+
+Utilizada para:
+
+* Criação de pedido
+* Estoque
+* Pagamento
+* Notificações
+* Auditoria
+
+Tecnologia:
+
+RabbitMQ
+
+---
+
+# Event Catalog
+
+Eventos principais:
+
+```text
+CustomerCreated
+
+ProductCreated
+ProductUpdated
+
+OrderCreated
+OrderConfirmed
+OrderCancelled
+
+InventoryReserved
+InventoryReleased
+InventoryFailed
+
+PaymentApproved
+PaymentRejected
+```
+
+---
+
+# Estratégia de Consistência
+
+O sistema NÃO utiliza transações distribuídas.
+
+Estratégia adotada:
+
+```text
+Consistência Eventual
+```
+
+Implementada através de:
+
+* RabbitMQ
+* Saga Pattern
+* Outbox Pattern
+
+---
+
+# Outbox Pattern
+
+Fluxo interno:
+
+```text
+Salvar Pedido
+      |
+Salvar Evento Outbox
+      |
+Commit
+      |
+Worker
+      |
+RabbitMQ
+```
+
+Objetivo:
+
+Evitar perda de eventos.
 
 ---
 
 # Cache
 
-Redis deve ser utilizado para:
+Utilizado em:
 
-* Carrinho
-* Produtos mais acessados
-* Dados de sessão
+## Carrinho
+
+Redis
 
 ---
 
-# API Gateway
+## Catálogo
 
-Responsabilidades:
+Opcionalmente:
 
-* Autenticação
-* Roteamento
-* Rate Limiting
-* Logging
+Redis
+
+---
+
+# Segurança
+
+Autenticação:
+
+JWT
+
+---
+
+Autorização:
+
+Roles
+
+Policies
+
+---
+
+# Observabilidade
+
+Todos os componentes devem fornecer:
+
+## Logs
+
+Serilog
+
+---
+
+## Traces
+
+OpenTelemetry
+
+---
+
+## Métricas
+
+Prometheus
+
+---
+
+## Dashboards
+
+Grafana
 
 ---
 
@@ -187,10 +778,39 @@ Todos os serviços:
 GET /health
 ```
 
-Retorno:
+---
 
-```json
-{
-  "status": "healthy"
-}
+# Métricas
+
+Todos os serviços:
+
+```http
+GET /metrics
 ```
+
+---
+
+# Objetivo Final
+
+Demonstrar uma implementação completa de:
+
+* Microservices
+* DDD
+* Clean Architecture
+* CQRS
+* RabbitMQ
+* Saga Pattern
+* Outbox Pattern
+* BFF Pattern
+* API Gateway
+* Redis
+* PostgreSQL
+* MongoDB
+* OpenTelemetry
+* Prometheus
+* Grafana
+* Docker
+* Kubernetes
+* Testes Automatizados
+
+em um cenário realista de e-commerce distribuído.
