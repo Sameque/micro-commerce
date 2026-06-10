@@ -1,0 +1,8 @@
+﻿global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "microcommerce-services"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["postgres:5432", "mongodb:27017", "redis:6379", "rabbitmq:5672"]
