@@ -1,4 +1,4 @@
-# MicroCommerce
+# Micro Commerce
 
 Uma plataforma completa de e-commerce desenvolvida utilizando arquitetura moderna baseada em Microservices.
 
